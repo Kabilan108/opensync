@@ -23,6 +23,7 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 - [x] opencode-sync-plugin published to npm ([npmjs.com/package/opencode-sync-plugin](https://www.npmjs.com/package/opencode-sync-plugin))
 - [x] Fixed Netlify build errors (vite-env.d.ts, @types/node, tsconfig types)
 - [x] Fixed Netlify SPA routing 404 errors (_redirects, netlify.toml)
+- [x] Added 404 catch-all route and WorkOS auth sync detection
 
 ## In Progress
 

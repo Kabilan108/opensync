@@ -20,6 +20,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fixed invalid title prop on Lucide icons in Sidebar.tsx
 - Fixed Netlify 404 "Page not found" for SPA routes (/login, /docs, /settings, etc.)
 - Added `public/_redirects` and `netlify.toml` for client-side routing support
+- Added 404 catch-all route in React app for unmatched routes
+- Added WorkOS auth state detection on login page (shows sign out if logged in but sync pending)
+- Enhanced netlify.toml with security headers and asset caching
 
 ### Changed
 
