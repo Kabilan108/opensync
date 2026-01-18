@@ -18,6 +18,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Updated tsconfig.json with vite/client and node types
 - Fixed unused variable error in Dashboard.tsx
 - Fixed invalid title prop on Lucide icons in Sidebar.tsx
+- Fixed Netlify 404 "Page not found" for SPA routes (/login, /docs, /settings, etc.)
+- Added `public/_redirects` and `netlify.toml` for client-side routing support
 
 ### Changed
 

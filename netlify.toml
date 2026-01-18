@@ -1,0 +1,10 @@
+# Netlify configuration for OpenSync SPA
+
+[build]
+  publish = "dist"
+
+# SPA fallback - all routes serve index.html so React Router handles navigation
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

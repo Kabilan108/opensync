@@ -13,6 +13,7 @@ Codebase file structure and descriptions.
 | `tsconfig.node.json` | TypeScript config for Node tooling |
 | `tailwind.config.js` | Tailwind CSS configuration |
 | `postcss.config.js` | PostCSS configuration |
+| `netlify.toml` | Netlify deployment config with SPA redirect rules |
 | `README.md` | Project documentation |
 
 ## convex/
@@ -91,6 +92,7 @@ Static assets.
 
 | File | Description |
 |------|-------------|
+| `_redirects` | Netlify SPA fallback rules for client-side routing |
 | `favicon.png` | PNG favicon |
 | `favicon.svg` | SVG favicon |
 | `convex.svg` | Convex logo |
