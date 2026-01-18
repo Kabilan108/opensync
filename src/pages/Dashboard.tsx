@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../lib/auth";
 import { cn } from "../lib/utils";
 import { useTheme, getThemeClasses } from "../lib/theme";
-import { StatCard, BarChart, AreaChart, DonutChart, FilterPill, ProgressBar } from "../components/Charts";
+import { StatCard, BarChart, DonutChart, FilterPill, ProgressBar } from "../components/Charts";
 import type { Id } from "../../convex/_generated/dataModel";
 import {
   Search,
@@ -945,8 +945,8 @@ function TimelineView({
     scrollRef.current.scrollLeft = scrollLeft - walk;
   };
 
-  // Model colors for tracks
-  const getTrackColor = (model?: string, index?: number) => {
+  // Track colors by index
+  const getTrackColor = (index?: number) => {
     const idx = index || 0;
     if (theme === "dark") {
       const colors = ["bg-blue-500/70", "bg-emerald-500/70", "bg-amber-500/70", "bg-purple-500/70", "bg-cyan-500/70", "bg-rose-500/70"];
@@ -992,7 +992,7 @@ function TimelineView({
           <div key={project} className={cn("flex border-b min-w-max", t.border)}>
             {/* Project label */}
             <div className={cn("w-48 shrink-0 px-3 py-3 border-r flex items-center gap-2", t.border, t.bgSecondary)}>
-              <div className={cn("w-2 h-2 rounded-full", getTrackColor(undefined, projectIdx))} />
+              <div className={cn("w-2 h-2 rounded-full", getTrackColor(projectIdx))} />
               <div className="min-w-0">
                 <p className={cn("text-xs truncate font-medium", t.textSecondary)}>{project}</p>
                 <p className={cn("text-[10px]", t.textDim)}>{projectSessions.length} sessions</p>
@@ -1013,7 +1013,7 @@ function TimelineView({
               </div>
 
               {/* Session blocks */}
-              {projectSessions.map((session, idx) => {
+              {projectSessions.map((session) => {
                 const left = getPositionPercent(session.createdAt);
                 const width = getWidthPercent(session.durationMs);
                 const isSelected = selectedSessionId === session._id;
@@ -1024,7 +1024,7 @@ function TimelineView({
                     onClick={() => onSelectSession(session._id)}
                     className={cn(
                       "absolute top-2 h-12 rounded-sm transition-all flex items-center px-2 overflow-hidden",
-                      getTrackColor(session.model, projectIdx),
+                      getTrackColor(projectIdx),
                       isSelected && "ring-2 ring-offset-1",
                       theme === "dark" ? "ring-white ring-offset-zinc-900" : "ring-[#1a1a1a] ring-offset-[#f5f0e8]"
                     )}
