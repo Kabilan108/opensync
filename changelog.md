@@ -10,12 +10,16 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - install.md file for AI agent installation following installmd.org spec (self-hosting setup instructions)
 - Collapsible Profile section in Settings page (collapsed by default for privacy during demos/recordings)
+- Theme toggle (dark/tan mode) on public session page (/s/:slug)
 
 ### Fixed
 
 - Fixed setup banner flash on dashboard refresh: banner now waits for data to load before showing
 - Fixed delete account not removing Convex data: changed deletion order to delete Convex data first, then WorkOS
 - Fixed delete account redirecting to WorkOS logout URL instead of homepage: replaced signOut() with direct redirect
+- Fixed public sessions not showing all data: added content normalization helpers for multi-plugin support
+- Fixed public sessions missing textContent fallback when parts array has no displayable content
+- Added tool-result part type rendering to public sessions (was missing)
 
 ### Changed
 

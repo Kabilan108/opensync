@@ -57,7 +57,7 @@ React frontend application.
 | `Dashboard.tsx` | Main dashboard with source filter dropdown, source badges (CC/OC), eval toggle button, Context link with search icon, setup banner for new users (loading-aware, no flash on refresh), and four views: Overview (stats, charts, setup banner), Sessions (filterable list with source badges), Evals (eval-ready sessions with export modal), Analytics (detailed breakdowns) |
 | `Settings.tsx` | Tabbed settings: API Access (keys, endpoints), Profile (collapsible section for privacy, account info, Danger Zone with delete data/account options) |
 | `Docs.tsx` | Comprehensive documentation page with left sidebar navigation (hidden scrollbar), right table of contents, anchor tags, copy/view as markdown buttons, mobile responsive, works with both dark/tan themes. Covers use hosted version (with features, plugin install, login/sync), requirements, quick start, dashboard features, OpenCode plugin, Claude Code plugin, API reference, search types, authentication, hosting, fork guide, troubleshooting, and FAQ |
-| `PublicSession.tsx` | Public session viewer for shared sessions (/s/:slug) |
+| `PublicSession.tsx` | Public session viewer for shared sessions (/s/:slug) with dark/tan theme toggle, content normalization for multi-plugin support, textContent fallback for empty parts |
 | `Evals.tsx` | Evals page with eval-ready session list, stats, export modal (DeepEval JSON, OpenAI JSONL, Filesystem formats) |
 | `Context.tsx` | Dedicated context search page (/context) with paginated full-text search for sessions and messages, no OpenAI key required |
 

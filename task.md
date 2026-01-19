@@ -93,6 +93,13 @@ None currently.
 
 ## Recently Completed
 
+- [x] Fixed public sessions not showing all data and missing theme toggle
+  - Added dark/tan theme toggle button (Sun/Moon icons) to public session header
+  - Added content normalization helpers (getTextContent, getToolCallDetails, getToolResult)
+  - Added textContent fallback when message.parts has no displayable content
+  - Added tool-result part type rendering (was missing)
+  - Updated all styling to use theme-aware classes
+
 - [x] Added install.md for AI agent installation (follows installmd.org spec for self-hosting setup)
 
 - [x] Fixed setup banner flash on dashboard refresh (banner now checks loading state before rendering)
