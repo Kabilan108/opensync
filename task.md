@@ -93,6 +93,12 @@ None currently.
 
 ## Recently Completed
 
+- [x] Setup banner for new users on Dashboard Overview
+  - Shows when totalSessions === 0 with links to both sync plugins
+  - Two plugin cards: opencode-sync-plugin (OC) and claude-code-sync (CC)
+  - npm install commands and GitHub/npm links for each
+  - Dismissible with X button, persists in localStorage
+
 - [x] Dashboard UX improvement: removed search bar, added search icon to Context link
   - Search functionality consolidated into dedicated Context page
   - Cleaner header with Context link as search entry point

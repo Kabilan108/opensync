@@ -328,6 +328,151 @@ export function DashboardPage() {
   );
 }
 
+// Setup banner for new users with no data
+function SetupBanner({ theme, onDismiss }: { theme: "dark" | "tan"; onDismiss: () => void }) {
+  const t = getThemeClasses(theme);
+  const isDark = theme === "dark";
+  
+  return (
+    <div className={cn(
+      "relative rounded-lg border p-4",
+      isDark ? "bg-zinc-800/50 border-zinc-700" : "bg-[#f5f3f0] border-[#d5d0c8]"
+    )}>
+      {/* Dismiss button */}
+      <button
+        onClick={onDismiss}
+        className={cn(
+          "absolute top-3 right-3 p-1 rounded transition-colors",
+          t.textSubtle, t.bgHover
+        )}
+        title="Dismiss"
+      >
+        <X className="h-4 w-4" />
+      </button>
+      
+      <div className="flex items-start gap-4">
+        {/* Icon */}
+        <div className={cn(
+          "shrink-0 w-10 h-10 rounded-lg flex items-center justify-center",
+          isDark ? "bg-blue-500/15" : "bg-[#EB5601]/10"
+        )}>
+          <Zap className={cn("h-5 w-5", isDark ? "text-blue-400" : "text-[#EB5601]")} />
+        </div>
+        
+        <div className="flex-1 min-w-0">
+          <h3 className={cn("text-sm font-medium mb-1", t.textPrimary)}>
+            Connect your coding sessions
+          </h3>
+          <p className={cn("text-xs mb-4", t.textMuted)}>
+            Install a sync plugin to start tracking your AI coding sessions. Choose based on your workflow.
+          </p>
+          
+          {/* Plugin cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {/* OpenCode Plugin */}
+            <div className={cn(
+              "rounded-lg border p-3",
+              isDark ? "bg-zinc-900/50 border-zinc-700" : "bg-white border-[#e5e0d8]"
+            )}>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-5 h-5 rounded bg-blue-500/15 flex items-center justify-center">
+                  <span className="text-[10px] font-medium text-blue-400">OC</span>
+                </div>
+                <span className={cn("text-xs font-medium", t.textSecondary)}>opencode-sync-plugin</span>
+              </div>
+              <p className={cn("text-[11px] mb-2", t.textDim)}>
+                Sync your OpenCode sessions to the dashboard.
+              </p>
+              <div className={cn(
+                "rounded px-2 py-1.5 text-[11px] font-mono mb-2",
+                isDark ? "bg-zinc-800" : "bg-[#f5f3f0]",
+                t.textMuted
+              )}>
+                npm install -g opencode-sync-plugin
+              </div>
+              <div className="flex items-center gap-2">
+                <a
+                  href="https://github.com/waynesutton/opencode-sync-plugin"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(
+                    "flex items-center gap-1 text-[10px] transition-colors",
+                    isDark ? "text-blue-400 hover:text-blue-300" : "text-[#EB5601] hover:opacity-80"
+                  )}
+                >
+                  <Github className="h-3 w-3" />
+                  GitHub
+                </a>
+                <a
+                  href="https://www.npmjs.com/package/opencode-sync-plugin"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(
+                    "flex items-center gap-1 text-[10px] transition-colors",
+                    isDark ? "text-blue-400 hover:text-blue-300" : "text-[#EB5601] hover:opacity-80"
+                  )}
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  npm
+                </a>
+              </div>
+            </div>
+            
+            {/* Claude Code Plugin */}
+            <div className={cn(
+              "rounded-lg border p-3",
+              isDark ? "bg-zinc-900/50 border-zinc-700" : "bg-white border-[#e5e0d8]"
+            )}>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-5 h-5 rounded bg-amber-500/15 flex items-center justify-center">
+                  <span className="text-[10px] font-medium text-amber-500">CC</span>
+                </div>
+                <span className={cn("text-xs font-medium", t.textSecondary)}>claude-code-sync</span>
+              </div>
+              <p className={cn("text-[11px] mb-2", t.textDim)}>
+                Sync your Claude Code sessions to the dashboard.
+              </p>
+              <div className={cn(
+                "rounded px-2 py-1.5 text-[11px] font-mono mb-2",
+                isDark ? "bg-zinc-800" : "bg-[#f5f3f0]",
+                t.textMuted
+              )}>
+                npm install -g claude-code-sync
+              </div>
+              <div className="flex items-center gap-2">
+                <a
+                  href="https://github.com/waynesutton/claude-code-sync"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(
+                    "flex items-center gap-1 text-[10px] transition-colors",
+                    isDark ? "text-amber-400 hover:text-amber-300" : "text-[#EB5601] hover:opacity-80"
+                  )}
+                >
+                  <Github className="h-3 w-3" />
+                  GitHub
+                </a>
+                <a
+                  href="https://www.npmjs.com/package/claude-code-sync"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(
+                    "flex items-center gap-1 text-[10px] transition-colors",
+                    isDark ? "text-amber-400 hover:text-amber-300" : "text-[#EB5601] hover:opacity-80"
+                  )}
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  npm
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Overview View - Dashboard home
 function OverviewView({
   summaryStats,
@@ -352,10 +497,30 @@ function OverviewView({
   // Get trend data for sparklines
   const tokenTrend = dailyStats.map((d) => d.totalTokens);
   const sessionTrend = dailyStats.map((d) => d.sessions);
+  
+  // Setup banner visibility state (persisted in localStorage)
+  const [showSetupBanner, setShowSetupBanner] = useState(() => {
+    const dismissed = localStorage.getItem("opensync_setup_banner_dismissed");
+    return dismissed !== "true";
+  });
+  
+  // Determine if user has no data
+  const hasNoData = !summaryStats || summaryStats.totalSessions === 0;
+  
+  // Handler to dismiss banner
+  const handleDismissBanner = () => {
+    setShowSetupBanner(false);
+    localStorage.setItem("opensync_setup_banner_dismissed", "true");
+  };
 
   return (
     <div className="h-full overflow-y-auto">
       <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+        {/* Setup banner for new users */}
+        {hasNoData && showSetupBanner && (
+          <SetupBanner theme={theme} onDismiss={handleDismissBanner} />
+        )}
+        
         {/* Stats row */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
           <StatCard

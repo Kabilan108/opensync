@@ -14,6 +14,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Setup banner on Dashboard Overview for new users with no synced data
+- Banner links to opencode-sync-plugin and claude-code-sync repos with npm install commands
+- Dismissible banner with X button, state persists in localStorage
 - Theme switcher on Login page footer (Sun/Moon icon, no text labels)
 
 - Delete synced data option in Settings (removes all sessions, messages, embeddings while keeping account)
