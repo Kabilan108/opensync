@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../lib/auth";
 import { cn } from "../lib/utils";
 import { useTheme, getThemeClasses } from "../lib/theme";
-import { StatCard, BarChart, DonutChart, FilterPill, ProgressBar } from "../components/Charts";
+import { StatCard, BarChart, DonutChart, FilterPill, ProgressBar, ConsumptionBreakdown } from "../components/Charts";
 import type { Id } from "../../convex/_generated/dataModel";
 import {
   Search,
@@ -40,6 +40,8 @@ import {
   Activity,
   Timer,
   BarChart3,
+  Github,
+  FileDown,
 } from "lucide-react";
 
 // View modes
@@ -307,6 +309,27 @@ export function DashboardPage() {
           />
         )}
       </main>
+
+      {/* Footer */}
+      <footer className={cn("h-10 border-t flex items-center justify-between px-4", t.border, t.bgPrimary)}>
+        <a
+          href="https://github.com/waynesutton/opensync"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={cn("flex items-center gap-1.5 text-xs transition-colors", t.textDim, "hover:opacity-80")}
+        >
+          <Github className="h-3.5 w-3.5" />
+          <span>opensync</span>
+        </a>
+        <a
+          href="https://convex.dev"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={cn("text-xs transition-colors", t.textDim, "hover:opacity-80")}
+        >
+          powered by convex
+        </a>
+      </footer>
     </div>
   );
 }
@@ -385,7 +408,71 @@ function OverviewView({
           />
         </div>
 
-        {/* Charts row */}
+        {/* Usage Overview Section */}
+        <ConsumptionBreakdown
+          dailyStats={dailyStats}
+          modelStats={modelStats}
+          projectStats={projectStats}
+          summaryStats={summaryStats}
+          theme={theme}
+        />
+
+        {/* Recent sessions and projects */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Recent sessions */}
+          <div className={cn("rounded-lg border overflow-hidden", t.bgCard, t.border)}>
+            <div className={cn("px-4 py-3 border-b flex items-center justify-between", t.border)}>
+              <h3 className={cn("text-xs font-normal", t.textMuted)}>Recent Sessions</h3>
+              <span className={cn("text-[10px]", t.textDim)}>{sessions.length} total</span>
+            </div>
+            <div className={t.divide}>
+              {sessions.slice(0, 8).map((session) => (
+                <SessionRow
+                  key={session._id}
+                  session={session}
+                  isSelected={selectedSessionId === session._id}
+                  onClick={() => onSelectSession(session._id)}
+                  theme={theme}
+                />
+              ))}
+              {sessions.length === 0 && (
+                <div className={cn("px-4 py-8 text-center text-sm", t.textDim)}>
+                  No sessions yet
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Projects */}
+          <div className={cn("rounded-lg border overflow-hidden", t.bgCard, t.border)}>
+            <div className={cn("px-4 py-3 border-b", t.border)}>
+              <h3 className={cn("text-xs font-normal", t.textMuted)}>Projects</h3>
+            </div>
+            <div className="p-4 space-y-3">
+              {projectStats.slice(0, 6).map((p) => (
+                <div key={p.project} className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className={cn("text-sm truncate max-w-[200px]", t.textSecondary)}>{p.project}</span>
+                    <span className={cn("text-xs", t.textDim)}>{formatNumber(p.totalTokens)} tokens</span>
+                  </div>
+                  <ProgressBar
+                    value={p.totalTokens}
+                    max={projectStats[0]?.totalTokens || 1}
+                    showPercentage={false}
+                    color={theme === "dark" ? "bg-zinc-600" : "bg-[#8b7355]"}
+                  />
+                </div>
+              ))}
+              {projectStats.length === 0 && (
+                <div className={cn("py-4 text-center text-sm", t.textDim)}>
+                  No projects yet
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Token Usage and Model Distribution */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Daily usage chart */}
           <div className={cn("lg:col-span-2 p-4 rounded-lg border", t.bgCard, t.border)}>
@@ -442,61 +529,6 @@ function OverviewView({
                   <span className={t.textDim}>{formatNumber(m.totalTokens)}</span>
                 </div>
               ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Recent sessions and projects */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Recent sessions */}
-          <div className={cn("rounded-lg border overflow-hidden", t.bgCard, t.border)}>
-            <div className={cn("px-4 py-3 border-b flex items-center justify-between", t.border)}>
-              <h3 className={cn("text-xs font-normal", t.textMuted)}>Recent Sessions</h3>
-              <span className={cn("text-[10px]", t.textDim)}>{sessions.length} total</span>
-            </div>
-            <div className={t.divide}>
-              {sessions.slice(0, 8).map((session) => (
-                <SessionRow
-                  key={session._id}
-                  session={session}
-                  isSelected={selectedSessionId === session._id}
-                  onClick={() => onSelectSession(session._id)}
-                  theme={theme}
-                />
-              ))}
-              {sessions.length === 0 && (
-                <div className={cn("px-4 py-8 text-center text-sm", t.textDim)}>
-                  No sessions yet
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Projects */}
-          <div className={cn("rounded-lg border overflow-hidden", t.bgCard, t.border)}>
-            <div className={cn("px-4 py-3 border-b", t.border)}>
-              <h3 className={cn("text-xs font-normal", t.textMuted)}>Projects</h3>
-            </div>
-            <div className="p-4 space-y-3">
-              {projectStats.slice(0, 6).map((p) => (
-                <div key={p.project} className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className={cn("text-sm truncate max-w-[200px]", t.textSecondary)}>{p.project}</span>
-                    <span className={cn("text-xs", t.textDim)}>{formatNumber(p.totalTokens)} tokens</span>
-                  </div>
-                  <ProgressBar
-                    value={p.totalTokens}
-                    max={projectStats[0]?.totalTokens || 1}
-                    showPercentage={false}
-                    color={theme === "dark" ? "bg-zinc-600" : "bg-[#8b7355]"}
-                  />
-                </div>
-              ))}
-              {projectStats.length === 0 && (
-                <div className={cn("py-4 text-center text-sm", t.textDim)}>
-                  No projects yet
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -557,8 +589,26 @@ function SessionsView({
     api.sessions.getMarkdown,
     selectedSession?.session?._id ? { sessionId: selectedSession.session._id } : "skip"
   );
+  const csvData = useQuery(api.sessions.exportAllDataCSV);
   const [copied, setCopied] = useState(false);
   const [sessionsViewMode, setSessionsViewMode] = useState<SessionsViewMode>("list");
+  const [isExportingCSV, setIsExportingCSV] = useState(false);
+
+  // CSV export handler
+  const handleExportCSV = () => {
+    if (!csvData) return;
+    setIsExportingCSV(true);
+    const timestamp = new Date().toISOString().split("T")[0];
+    const filename = `opensync_sessions_${timestamp}.csv`;
+    const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+    setTimeout(() => setIsExportingCSV(false), 1000);
+  };
   
   // Drag scroll state for sessions list
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -689,6 +739,18 @@ function SessionsView({
               title="Timeline view"
             >
               <Layers className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={handleExportCSV}
+              disabled={!csvData || isExportingCSV}
+              className={cn(
+                "p-1 rounded transition-colors",
+                !csvData || isExportingCSV ? "opacity-50 cursor-not-allowed" : "",
+                t.textSubtle, "hover:opacity-80"
+              )}
+              title="Export all sessions as CSV"
+            >
+              <FileDown className={cn("h-3.5 w-3.5", isExportingCSV && "animate-pulse")} />
             </button>
           </div>
 

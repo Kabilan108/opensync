@@ -57,6 +57,13 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 - [x] WorkOS login fix: session persistence across page refresh with proper callback handling
 - [x] Plugin Setup section in Settings with Convex URL and API Key display
 - [x] WORKOS-AUTH.md documentation for auth architecture
+- [x] ConsumptionBreakdown component with stacked bar chart, credit bar, and usage table
+- [x] Overview layout reorder: Usage Overview up, Token Usage and Model Distribution to bottom
+- [x] Dashboard footer with GitHub repo link and "powered by convex" attribution
+- [x] CSV export for all user session data (exportAllDataCSV Convex query)
+- [x] Export CSV button in sessions view toolbar next to list/timeline toggle
+- [x] Privacy messaging on login page ("Private - your data stays in your account")
+- [x] Removed EnvStatus debug component from login footer
 
 ## In Progress
 

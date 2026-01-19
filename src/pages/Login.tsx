@@ -92,6 +92,10 @@ export function LoginPage() {
                   <span className="text-zinc-400">Share</span> public links in
                   one click
                 </p>
+                <p>
+                  <span className="text-zinc-400">Private</span> your data stays
+                  in your account
+                </p>
               </div>
 
               {/* CTA */}
@@ -294,47 +298,8 @@ export function LoginPage() {
               </a>
             </div>
           </div>
-          {/* Debug info - shows env var status */}
-          <EnvStatus />
         </footer>
       </div>
-    </div>
-  );
-}
-
-// Separate component to check env vars and auth status
-function EnvStatus() {
-  const workosId = import.meta.env.VITE_WORKOS_CLIENT_ID;
-  const convexUrl = import.meta.env.VITE_CONVEX_URL;
-  const { user: workosUser } = useAuthKit();
-  const { isAuthenticated } = useAuth();
-
-  return (
-    <div className="flex flex-wrap items-center justify-center gap-3 text-[10px] text-zinc-700">
-      <span>
-        WorkOS:{" "}
-        <span className={workosId ? "text-emerald-600" : "text-red-500"}>
-          {workosId ? "ok" : "missing"}
-        </span>
-      </span>
-      <span>
-        Convex:{" "}
-        <span className={convexUrl ? "text-emerald-600" : "text-red-500"}>
-          {convexUrl ? "ok" : "missing"}
-        </span>
-      </span>
-      <span>
-        User:{" "}
-        <span className={workosUser ? "text-emerald-600" : "text-zinc-600"}>
-          {workosUser ? "yes" : "no"}
-        </span>
-      </span>
-      <span>
-        Auth:{" "}
-        <span className={isAuthenticated ? "text-emerald-600" : "text-zinc-600"}>
-          {isAuthenticated ? "synced" : "pending"}
-        </span>
-      </span>
     </div>
   );
 }

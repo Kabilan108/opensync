@@ -26,7 +26,7 @@ Backend functions and schema.
 | `auth.config.ts` | WorkOS JWT validation configuration |
 | `convex.config.ts` | Convex app configuration |
 | `users.ts` | User queries/mutations: getOrCreate, me, stats, API key management |
-| `sessions.ts` | Session CRUD: list, get, getPublic, setVisibility, remove, getMarkdown, upsert, listExternalIds |
+| `sessions.ts` | Session CRUD: list, get, getPublic, setVisibility, remove, getMarkdown, upsert, listExternalIds, exportAllDataCSV |
 | `messages.ts` | Message mutations: upsert with parts |
 | `analytics.ts` | Analytics queries: dailyStats, modelStats, projectStats (extended with messageCount, promptTokens, completionTokens, totalDurationMs), providerStats, summaryStats, sessionsWithDetails |
 | `search.ts` | Full-text and semantic search: searchSessions, searchMessages, semanticSearch, hybridSearch |
@@ -51,7 +51,7 @@ React frontend application.
 
 | File | Description |
 |------|-------------|
-| `Login.tsx` | Login page with WorkOS AuthKit integration |
+| `Login.tsx` | Login page with WorkOS AuthKit integration, privacy messaging |
 | `Dashboard.tsx` | Main dashboard with three views: Overview (stats, charts), Sessions (filterable list), Analytics (detailed breakdowns) |
 | `Settings.tsx` | Tabbed settings: Usage (charts, stats), API Access (keys, endpoints), Profile (account info) |
 | `Docs.tsx` | Interactive API documentation page |
@@ -64,7 +64,7 @@ React frontend application.
 | `Header.tsx` | Top navigation with search input and user menu |
 | `Sidebar.tsx` | Session list sidebar with search results |
 | `SessionViewer.tsx` | Session detail view with messages and actions |
-| `Charts.tsx` | Reusable chart components: BarChart, AreaChart, DonutChart, Sparkline, ProgressBar, StatCard, DataTable, FilterPill |
+| `Charts.tsx` | Reusable chart components: BarChart, AreaChart, DonutChart, Sparkline, ProgressBar, StatCard, DataTable, FilterPill, StackedBarChart, UsageCreditBar, ConsumptionBreakdown |
 
 ### src/lib/
 

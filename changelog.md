@@ -8,6 +8,16 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- ConsumptionBreakdown component with stacked bar chart, credit usage bar, and usage table
+- StackedBarChart component for multi-segment bar visualization with tooltips
+- UsageCreditBar component showing included credit vs on-demand charges
+- Dashboard footer with GitHub repo link and "powered by convex" attribution
+- CSV export for all user session data (exportAllDataCSV query)
+- Export CSV button in sessions view next to list/timeline toggle
+- Daily/Weekly/Monthly view toggle for consumption breakdown
+- Cumulative mode toggle for usage visualization
+- Project and model filters in consumption breakdown
+- Privacy messaging on login page ("Private - your data stays in your account")
 - Netlify logo added to login page footer alongside Convex and WorkOS logos
 - Close icon (X) button to session detail panel header for desktop users
 - Hidden scrollbar CSS utility class for cleaner UI while maintaining scroll functionality
@@ -32,6 +42,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- Overview layout: Usage Overview section moved above Recent Sessions, Token Usage and Model Distribution moved to bottom
+- Removed EnvStatus debug component from login page footer (cleaner production UI)
 - Removed Daily Activity chart from Analytics view (replaced with more detailed metrics)
 - Updated projectStats Convex query to include messageCount, promptTokens, completionTokens, and totalDurationMs
 - Tan mode theme toggle for Dashboard, Settings, and Docs pages (dark mode remains default)

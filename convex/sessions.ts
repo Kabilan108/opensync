@@ -371,3 +371,73 @@ export const listExternalIds = internalQuery({
     return sessions.map((s) => s.externalId);
   },
 });
+
+// Export all user data as CSV
+export const exportAllDataCSV = query({
+  args: {},
+  returns: v.string(),
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_workos_id", (q) => q.eq("workosId", identity.subject))
+      .first();
+
+    if (!user) throw new Error("User not found");
+
+    // Get all sessions
+    const sessions = await ctx.db
+      .query("sessions")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+
+    // Build CSV header
+    const headers = [
+      "Session ID",
+      "External ID",
+      "Title",
+      "Project Name",
+      "Project Path",
+      "Model",
+      "Provider",
+      "Prompt Tokens",
+      "Completion Tokens",
+      "Total Tokens",
+      "Cost",
+      "Duration (ms)",
+      "Message Count",
+      "Is Public",
+      "Public Slug",
+      "Created At",
+      "Updated At",
+    ];
+
+    // Build CSV rows
+    const rows = sessions.map((s) => [
+      s._id,
+      s.externalId,
+      `"${(s.title || "").replace(/"/g, '""')}"`,
+      `"${(s.projectName || "").replace(/"/g, '""')}"`,
+      `"${(s.projectPath || "").replace(/"/g, '""')}"`,
+      s.model || "",
+      s.provider || "",
+      s.promptTokens,
+      s.completionTokens,
+      s.totalTokens,
+      s.cost.toFixed(6),
+      s.durationMs || "",
+      s.messageCount,
+      s.isPublic,
+      s.publicSlug || "",
+      new Date(s.createdAt).toISOString(),
+      new Date(s.updatedAt).toISOString(),
+    ]);
+
+    // Combine header and rows
+    const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+
+    return csv;
+  },
+});

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { cn } from "../lib/utils";
 
 // Simple bar chart for usage data
@@ -435,5 +435,542 @@ export function FilterPill({ label, value, onClear, active, className }: FilterP
         </svg>
       )}
     </button>
+  );
+}
+
+// Stacked bar chart for consumption breakdown
+interface StackedBarChartProps {
+  data: Array<{
+    label: string;
+    segments: Array<{ value: number; color: string; label: string }>;
+  }>;
+  height?: number;
+  showLabels?: boolean;
+  formatValue?: (value: number) => string;
+  theme?: "dark" | "tan";
+  className?: string;
+}
+
+export function StackedBarChart({
+  data,
+  height = 200,
+  showLabels = true,
+  formatValue = (v) => v.toLocaleString(),
+  theme = "dark",
+  className,
+}: StackedBarChartProps) {
+  const isDark = theme === "dark";
+  const maxValue = useMemo(() => {
+    return Math.max(
+      ...data.map((d) => d.segments.reduce((sum, s) => sum + s.value, 0)),
+      1
+    );
+  }, [data]);
+
+  if (data.length === 0) {
+    return (
+      <div 
+        className={cn(
+          "flex items-center justify-center text-sm",
+          isDark ? "text-zinc-600" : "text-[#8b7355]",
+          className
+        )} 
+        style={{ height }}
+      >
+        No data
+      </div>
+    );
+  }
+
+  return (
+    <div className={cn("w-full", className)}>
+      <div className="flex items-end gap-1" style={{ height }}>
+        {data.map((item, i) => {
+          const total = item.segments.reduce((sum, s) => sum + s.value, 0);
+          const barHeight = (total / maxValue) * 100;
+          
+          return (
+            <div key={i} className="flex-1 flex flex-col items-center group relative">
+              <div
+                className="w-full flex flex-col-reverse rounded-t overflow-hidden"
+                style={{ height: `${barHeight}%`, minHeight: total > 0 ? 2 : 0 }}
+              >
+                {item.segments.map((segment, j) => {
+                  const segmentHeight = total > 0 ? (segment.value / total) * 100 : 0;
+                  return (
+                    <div
+                      key={j}
+                      className={cn("w-full transition-opacity group-hover:opacity-80")}
+                      style={{ 
+                        height: `${segmentHeight}%`, 
+                        backgroundColor: segment.color,
+                        minHeight: segment.value > 0 ? 1 : 0,
+                      }}
+                    />
+                  );
+                })}
+              </div>
+              {/* Tooltip */}
+              <div className={cn(
+                "absolute bottom-full mb-2 px-3 py-2 rounded text-xs whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 shadow-lg",
+                isDark ? "bg-zinc-800 border border-zinc-700 text-zinc-200" : "bg-[#f5f3f0] border border-[#e6e4e1] text-[#1a1a1a]"
+              )}>
+                <div className={cn("font-medium mb-1", isDark ? "text-zinc-100" : "text-[#1a1a1a]")}>{item.label}</div>
+                {item.segments.map((seg, j) => (
+                  <div key={j} className="flex items-center gap-2 py-0.5">
+                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: seg.color }} />
+                    <span className={isDark ? "text-zinc-400" : "text-[#6b6b6b]"}>{seg.label}:</span>
+                    <span className={isDark ? "text-zinc-200" : "text-[#1a1a1a]"}>{formatValue(seg.value)}</span>
+                  </div>
+                ))}
+                <div className={cn("border-t mt-1 pt-1", isDark ? "border-zinc-700" : "border-[#e6e4e1]")}>
+                  <span className={isDark ? "text-zinc-300" : "text-[#1a1a1a]"}>Total: {formatValue(total)}</span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {showLabels && (
+        <div className="flex gap-1 mt-2">
+          {data.map((item, i) => (
+            <div key={i} className="flex-1 text-center">
+              <span className={cn("text-[10px] truncate block", isDark ? "text-zinc-600" : "text-[#8b7355]")}>
+                {item.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Usage credit bar component
+interface UsageCreditBarProps {
+  included: number;
+  used: number;
+  onDemand: number;
+  theme?: "dark" | "tan";
+  className?: string;
+}
+
+export function UsageCreditBar({
+  included,
+  used,
+  onDemand,
+  theme = "dark",
+  className,
+}: UsageCreditBarProps) {
+  const isDark = theme === "dark";
+  const total = included + onDemand;
+  const includedPercent = total > 0 ? (Math.min(used, included) / total) * 100 : 0;
+  const onDemandPercent = total > 0 ? (onDemand / total) * 100 : 0;
+
+  return (
+    <div className={cn("space-y-2", className)}>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className={cn(
+            "w-8 h-8 rounded-full flex items-center justify-center",
+            isDark ? "bg-blue-500/20" : "bg-[#EB5601]/20"
+          )}>
+            <svg className={cn("w-4 h-4", isDark ? "text-blue-400" : "text-[#EB5601]")} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+          </div>
+          <div>
+            <p className={cn("text-xs", isDark ? "text-zinc-500" : "text-[#6b6b6b]")}>Included Credit</p>
+            <p className={cn("text-sm font-medium", isDark ? "text-zinc-200" : "text-[#1a1a1a]")}>
+              ${used.toFixed(2)} / ${included.toFixed(2)}
+            </p>
+          </div>
+        </div>
+        <div className="text-right">
+          <p className={cn("text-xs", isDark ? "text-zinc-500" : "text-[#6b6b6b]")}>On-Demand Charges</p>
+          <div className="flex items-center gap-2">
+            <p className={cn("text-sm font-medium", isDark ? "text-zinc-200" : "text-[#1a1a1a]")}>
+              ${onDemand.toFixed(2)}
+            </p>
+            <div className={cn(
+              "w-5 h-5 rounded-full flex items-center justify-center text-[10px]",
+              isDark ? "bg-zinc-700 text-zinc-300" : "bg-[#ebe9e6] text-[#6b6b6b]"
+            )}>
+              $
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className={cn("h-2 rounded-full overflow-hidden flex", isDark ? "bg-zinc-800" : "bg-[#e6e4e1]")}>
+        <div 
+          className={cn("h-full transition-all", isDark ? "bg-blue-500" : "bg-[#EB5601]")}
+          style={{ width: `${includedPercent}%` }}
+        />
+        <div 
+          className={cn("h-full transition-all", isDark ? "bg-purple-500" : "bg-[#8b7355]")}
+          style={{ width: `${onDemandPercent}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+// Consumption breakdown component (main export for dashboard)
+interface ConsumptionBreakdownProps {
+  dailyStats: Array<{
+    date: string;
+    sessions: number;
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+    cost: number;
+    durationMs: number;
+  }>;
+  modelStats: Array<{
+    model: string;
+    sessions: number;
+    totalTokens: number;
+    cost: number;
+  }>;
+  projectStats: Array<{
+    project: string;
+    sessions: number;
+    totalTokens: number;
+    cost: number;
+  }>;
+  summaryStats: {
+    totalCost: number;
+    totalTokens: number;
+    totalSessions: number;
+  } | null;
+  theme?: "dark" | "tan";
+  className?: string;
+}
+
+export function ConsumptionBreakdown({
+  dailyStats,
+  modelStats,
+  projectStats,
+  summaryStats,
+  theme = "dark",
+  className,
+}: ConsumptionBreakdownProps) {
+  const isDark = theme === "dark";
+  const [viewMode, setViewMode] = useState<"daily" | "weekly" | "monthly">("daily");
+  const [isCumulative, setIsCumulative] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<string | undefined>();
+  const [selectedModel, setSelectedModel] = useState<string | undefined>();
+
+  // Color palette for stacked bars
+  const colors = isDark
+    ? ["#3b82f6", "#22c55e", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4", "#ec4899", "#84cc16"]
+    : ["#EB5601", "#8b7355", "#d14a01", "#6b6b6b", "#a67c52", "#4a4a4a", "#c9744a", "#5c5c5c"];
+
+  // Process data based on view mode
+  const processedData = useMemo(() => {
+    if (dailyStats.length === 0) return [];
+
+    // Filter by selected project/model if applicable
+    let filtered = [...dailyStats];
+    
+    // Group by period
+    const grouped: Record<string, typeof dailyStats> = {};
+    
+    filtered.forEach((d) => {
+      let key = d.date;
+      if (viewMode === "weekly") {
+        const date = new Date(d.date);
+        const weekStart = new Date(date);
+        weekStart.setDate(date.getDate() - date.getDay());
+        key = weekStart.toISOString().split("T")[0];
+      } else if (viewMode === "monthly") {
+        key = d.date.substring(0, 7);
+      }
+      
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(d);
+    });
+
+    // Aggregate each period
+    const aggregated = Object.entries(grouped).map(([period, items]) => {
+      const totals = items.reduce(
+        (acc, item) => ({
+          sessions: acc.sessions + item.sessions,
+          promptTokens: acc.promptTokens + item.promptTokens,
+          completionTokens: acc.completionTokens + item.completionTokens,
+          totalTokens: acc.totalTokens + item.totalTokens,
+          cost: acc.cost + item.cost,
+          durationMs: acc.durationMs + item.durationMs,
+        }),
+        { sessions: 0, promptTokens: 0, completionTokens: 0, totalTokens: 0, cost: 0, durationMs: 0 }
+      );
+      return { period, ...totals };
+    });
+
+    // Sort by period
+    aggregated.sort((a, b) => a.period.localeCompare(b.period));
+
+    // Apply cumulative if needed
+    if (isCumulative) {
+      let cumSessions = 0;
+      let cumPrompt = 0;
+      let cumCompletion = 0;
+      let cumTokens = 0;
+      let cumCost = 0;
+      let cumDuration = 0;
+      
+      return aggregated.map((d) => {
+        cumSessions += d.sessions;
+        cumPrompt += d.promptTokens;
+        cumCompletion += d.completionTokens;
+        cumTokens += d.totalTokens;
+        cumCost += d.cost;
+        cumDuration += d.durationMs;
+        return {
+          ...d,
+          sessions: cumSessions,
+          promptTokens: cumPrompt,
+          completionTokens: cumCompletion,
+          totalTokens: cumTokens,
+          cost: cumCost,
+          durationMs: cumDuration,
+        };
+      });
+    }
+
+    return aggregated;
+  }, [dailyStats, viewMode, isCumulative]);
+
+  // Format period label
+  const formatPeriodLabel = (period: string) => {
+    if (viewMode === "monthly") {
+      const [year, month] = period.split("-");
+      return new Date(parseInt(year), parseInt(month) - 1).toLocaleDateString("en", { month: "short" });
+    }
+    const date = new Date(period);
+    if (viewMode === "weekly") {
+      return `${date.toLocaleDateString("en", { month: "short", day: "numeric" })}`;
+    }
+    return date.toLocaleDateString("en", { month: "short", day: "numeric" });
+  };
+
+  // Build chart data with model/project segments
+  const chartData = useMemo(() => {
+    // Use cost breakdown by model for each period
+    return processedData.slice(-30).map((d) => ({
+      label: formatPeriodLabel(d.period),
+      segments: modelStats.slice(0, 6).map((m, i) => ({
+        label: m.model,
+        // Distribute the period's cost proportionally by model
+        value: summaryStats?.totalCost 
+          ? (d.cost * m.cost / summaryStats.totalCost)
+          : d.cost / modelStats.length,
+        color: colors[i % colors.length],
+      })),
+    }));
+  }, [processedData, modelStats, summaryStats, colors]);
+
+  // Date range display
+  const dateRange = useMemo(() => {
+    if (dailyStats.length === 0) return "No data";
+    const dates = dailyStats.map((d) => d.date).sort();
+    const start = new Date(dates[0]);
+    const end = new Date(dates[dates.length - 1]);
+    return `${start.toLocaleDateString("en", { month: "short", day: "numeric", year: "2-digit" })} - ${end.toLocaleDateString("en", { month: "short", day: "numeric", year: "2-digit" })}`;
+  }, [dailyStats]);
+
+  // Calculate usage metrics
+  const includedCredit = 20.0; // Example included credit
+  const usedCredit = Math.min(summaryStats?.totalCost || 0, includedCredit);
+  const onDemandCharges = Math.max((summaryStats?.totalCost || 0) - includedCredit, 0);
+
+  return (
+    <div className={cn(
+      "rounded-lg border overflow-hidden",
+      isDark ? "bg-zinc-900/30 border-zinc-800/50" : "bg-[#f5f3f0] border-[#e6e4e1]",
+      className
+    )}>
+      {/* Header */}
+      <div className={cn("px-4 py-3 border-b", isDark ? "border-zinc-800/50" : "border-[#e6e4e1]")}>
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <h3 className={cn("text-sm font-medium", isDark ? "text-zinc-100" : "text-[#1a1a1a]")}>
+            Usage Overview
+          </h3>
+          
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Date range */}
+            <div className={cn(
+              "flex items-center gap-2 px-3 py-1.5 rounded-md border text-xs",
+              isDark ? "bg-zinc-800/50 border-zinc-700 text-zinc-300" : "bg-[#ebe9e6] border-[#e6e4e1] text-[#1a1a1a]"
+            )}>
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+              {dateRange}
+            </div>
+            
+            {/* Project filter */}
+            <select
+              value={selectedProject || ""}
+              onChange={(e) => setSelectedProject(e.target.value || undefined)}
+              className={cn(
+                "text-xs rounded-md px-3 py-1.5 border focus:outline-none",
+                isDark ? "bg-zinc-800/50 border-zinc-700 text-zinc-300" : "bg-[#ebe9e6] border-[#e6e4e1] text-[#1a1a1a]"
+              )}
+            >
+              <option value="">All Projects</option>
+              {projectStats.slice(0, 10).map((p) => (
+                <option key={p.project} value={p.project}>{p.project}</option>
+              ))}
+            </select>
+            
+            {/* Model filter */}
+            <select
+              value={selectedModel || ""}
+              onChange={(e) => setSelectedModel(e.target.value || undefined)}
+              className={cn(
+                "text-xs rounded-md px-3 py-1.5 border focus:outline-none",
+                isDark ? "bg-zinc-800/50 border-zinc-700 text-zinc-300" : "bg-[#ebe9e6] border-[#e6e4e1] text-[#1a1a1a]"
+              )}
+            >
+              <option value="">All Models</option>
+              {modelStats.slice(0, 10).map((m) => (
+                <option key={m.model} value={m.model}>{m.model}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Credit usage bar */}
+      <div className={cn("px-4 py-4 border-b", isDark ? "border-zinc-800/50" : "border-[#e6e4e1]")}>
+        <UsageCreditBar
+          included={includedCredit}
+          used={usedCredit}
+          onDemand={onDemandCharges}
+          theme={theme}
+        />
+      </div>
+
+      {/* Chart section */}
+      <div className="px-4 py-4">
+        <div className="flex items-center justify-between mb-4">
+          <h4 className={cn("text-xs font-normal", isDark ? "text-zinc-500" : "text-[#6b6b6b]")}>
+            Consumption Breakdown
+          </h4>
+          
+          <div className="flex items-center gap-3">
+            {/* View mode toggle */}
+            <div className={cn(
+              "flex items-center rounded-md p-0.5 border",
+              isDark ? "bg-zinc-800/50 border-zinc-700" : "bg-[#ebe9e6] border-[#e6e4e1]"
+            )}>
+              {(["daily", "weekly", "monthly"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => setViewMode(mode)}
+                  className={cn(
+                    "px-3 py-1 text-xs rounded transition-colors capitalize",
+                    viewMode === mode
+                      ? isDark ? "bg-zinc-700 text-zinc-100" : "bg-white text-[#1a1a1a] shadow-sm"
+                      : isDark ? "text-zinc-500 hover:text-zinc-300" : "text-[#6b6b6b] hover:text-[#1a1a1a]"
+                  )}
+                >
+                  {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                </button>
+              ))}
+            </div>
+            
+            {/* Cumulative toggle */}
+            <label className={cn(
+              "flex items-center gap-2 text-xs cursor-pointer",
+              isDark ? "text-zinc-400" : "text-[#6b6b6b]"
+            )}>
+              <input
+                type="checkbox"
+                checked={isCumulative}
+                onChange={(e) => setIsCumulative(e.target.checked)}
+                className={cn(
+                  "w-4 h-4 rounded border focus:ring-offset-0",
+                  isDark ? "bg-zinc-800 border-zinc-600" : "bg-white border-[#e6e4e1]"
+                )}
+              />
+              Cumulative
+            </label>
+          </div>
+        </div>
+
+        {/* Stacked bar chart */}
+        <StackedBarChart
+          data={chartData}
+          height={180}
+          formatValue={(v) => `$${v.toFixed(2)}`}
+          theme={theme}
+        />
+
+        {/* Legend */}
+        <div className="flex flex-wrap gap-3 mt-4">
+          {modelStats.slice(0, 6).map((m, i) => (
+            <div key={m.model} className="flex items-center gap-1.5 text-xs">
+              <span 
+                className="w-2.5 h-2.5 rounded-sm" 
+                style={{ backgroundColor: colors[i % colors.length] }} 
+              />
+              <span className={isDark ? "text-zinc-400" : "text-[#6b6b6b]"}>{m.model}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Usage table */}
+      <div className={cn("border-t", isDark ? "border-zinc-800/50" : "border-[#e6e4e1]")}>
+        <table className="w-full">
+          <thead>
+            <tr className={cn("border-b text-[10px] uppercase tracking-wider", isDark ? "border-zinc-800/30 text-zinc-600" : "border-[#e6e4e1] text-[#8b7355]")}>
+              <th className="px-4 py-2 text-left font-normal">Product</th>
+              <th className="px-4 py-2 text-right font-normal">Usage</th>
+              <th className="px-4 py-2 text-right font-normal">Charge</th>
+            </tr>
+          </thead>
+          <tbody>
+            {modelStats.slice(0, 5).map((m, i) => (
+              <tr key={m.model} className={cn("border-b transition-colors", isDark ? "border-zinc-800/30 hover:bg-zinc-800/30" : "border-[#e6e4e1] hover:bg-[#ebe9e6]")}>
+                <td className="px-4 py-2.5">
+                  <div className="flex items-center gap-2">
+                    <span 
+                      className="w-2 h-2 rounded-full" 
+                      style={{ backgroundColor: colors[i % colors.length] }} 
+                    />
+                    <span className={cn("text-sm", isDark ? "text-zinc-300" : "text-[#1a1a1a]")}>{m.model}</span>
+                  </div>
+                </td>
+                <td className={cn("px-4 py-2.5 text-sm text-right", isDark ? "text-zinc-400" : "text-[#6b6b6b]")}>
+                  {(m.totalTokens / 1000).toFixed(1)}K tokens
+                </td>
+                <td className={cn("px-4 py-2.5 text-sm text-right font-medium", isDark ? "text-zinc-200" : "text-[#1a1a1a]")}>
+                  ${m.cost.toFixed(4)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr className={isDark ? "bg-zinc-800/20" : "bg-[#ebe9e6]/50"}>
+              <td className={cn("px-4 py-2.5 text-sm font-medium", isDark ? "text-zinc-200" : "text-[#1a1a1a]")}>
+                Total
+              </td>
+              <td className={cn("px-4 py-2.5 text-sm text-right", isDark ? "text-zinc-400" : "text-[#6b6b6b]")}>
+                {((summaryStats?.totalTokens || 0) / 1000).toFixed(1)}K tokens
+              </td>
+              <td className={cn("px-4 py-2.5 text-sm text-right font-medium", isDark ? "text-zinc-100" : "text-[#1a1a1a]")}>
+                ${(summaryStats?.totalCost || 0).toFixed(4)}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
   );
 }
