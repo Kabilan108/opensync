@@ -24,6 +24,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Page-specific theme defaults configuration (PAGE_THEME_DEFAULTS) in theme.tsx
+- usePageTheme hook to apply different default themes per page (login: dark, dashboard: tan)
+- PageType type for type-safe page identifiers (login, dashboard, docs, settings, default)
+- getPageDefaultTheme helper function for retrieving page-specific defaults
+
 - Comprehensive documentation page with Mintlify-style UI
 - Left sidebar navigation with collapsible sections and anchor tags
 - Right table of contents for on-page navigation

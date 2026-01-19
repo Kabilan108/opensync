@@ -93,6 +93,12 @@ None currently.
 
 ## Recently Completed
 
+- [x] Page-specific theme defaults configuration
+  - Added PAGE_THEME_DEFAULTS config object in theme.tsx
+  - Added usePageTheme hook to apply different defaults per page
+  - Login page defaults to dark, dashboard/docs/settings default to tan
+  - User preferences in localStorage always take priority over page defaults
+
 - [x] Fixed delete account partial deletion and redirect issues
   - Changed deleteAccount action to delete Convex data first, then WorkOS
   - Prevents partial deletion when WorkOS deletion triggers session invalidation

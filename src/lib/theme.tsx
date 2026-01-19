@@ -3,6 +3,23 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 // Theme types
 export type Theme = "dark" | "tan";
 
+// Page identifiers for theme defaults
+export type PageType = "login" | "dashboard" | "docs" | "settings" | "default";
+
+// Page-specific theme defaults - configure different defaults per page here
+export const PAGE_THEME_DEFAULTS: Record<PageType, Theme> = {
+  login: "dark",      // Home/Login page defaults to tan
+  dashboard: "tan", // Dashboard defaults to dark
+  docs: "tan",      // Docs page defaults to dark
+  settings: "tan",  // Settings page defaults to dark
+  default: "dark",   // Fallback default
+};
+
+// Helper to get default theme for a specific page
+export function getPageDefaultTheme(page: PageType = "default"): Theme {
+  return PAGE_THEME_DEFAULTS[page] ?? PAGE_THEME_DEFAULTS.default;
+}
+
 // Tan mode color palette
 export const tanColors = {
   bgPrimary: "#faf8f5",
@@ -38,7 +55,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         return stored;
       }
     }
-    return "tan"; // Default to tan mode
+    return PAGE_THEME_DEFAULTS.default; // Use configurable default from PAGE_THEME_DEFAULTS
   });
 
   // Persist theme changes
@@ -68,6 +85,25 @@ export function useTheme() {
     throw new Error("useTheme must be used within a ThemeProvider");
   }
   return context;
+}
+
+// Hook to apply page-specific default theme on mount
+// Only applies if user hasn't set a preference (no stored theme)
+export function usePageTheme(page: PageType) {
+  const { theme, setTheme } = useTheme();
+  
+  useEffect(() => {
+    // Only apply page default if no user preference is stored
+    const stored = localStorage.getItem(THEME_STORAGE_KEY);
+    if (!stored) {
+      const pageDefault = getPageDefaultTheme(page);
+      if (theme !== pageDefault) {
+        setTheme(pageDefault);
+      }
+    }
+  }, [page]); // Only run on mount or page change
+  
+  return { theme, setTheme };
 }
 
 // Helper to get theme-aware class names
