@@ -1,5 +1,5 @@
 import { useState, useEffect, type ReactNode } from "react";
-import { Routes, Route, Navigate, Link } from "react-router-dom";
+import { Routes, Route, Navigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "./lib/auth";
 import { ThemeProvider } from "./lib/theme";
 import { LoginPage } from "./pages/Login";
@@ -11,9 +11,25 @@ import { EvalsPage } from "./pages/Evals";
 import { ContextPage } from "./pages/Context";
 import { Loader2, ArrowLeft } from "lucide-react";
 
+// Storage key for preserving intended route across auth flow
+const RETURN_TO_KEY = "opensync_return_to";
+
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { isLoading, isAuthenticated, user } = useAuth();
+  const location = useLocation();
   const [syncTimeout, setSyncTimeout] = useState(false);
+
+  // Save the intended route before redirecting to login
+  // This allows returning to the original page after authentication
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated && !user) {
+      const currentPath = location.pathname + location.search;
+      // Only save if not already on login/callback routes
+      if (currentPath !== "/login" && currentPath !== "/callback") {
+        sessionStorage.setItem(RETURN_TO_KEY, currentPath);
+      }
+    }
+  }, [isLoading, isAuthenticated, user, location]);
 
   // Timeout for sync loading state (5 seconds max)
   useEffect(() => {

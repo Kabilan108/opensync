@@ -4,6 +4,9 @@ import { Navigate } from "react-router-dom";
 import { Loader2, Sun, Moon, Github } from "lucide-react";
 import { useTheme } from "../lib/theme";
 
+// Storage key for preserving intended route across auth flow
+const RETURN_TO_KEY = "opensync_return_to";
+
 const ASCII_LOGO = `
  ██████╗ ██████╗ ███████╗███╗   ██╗███████╗██╗   ██╗███╗   ██╗ ██████╗
 ██╔═══██╗██╔══██╗██╔════╝████╗  ██║██╔════╝╚██╗ ██╔╝████╗  ██║██╔════╝
@@ -63,9 +66,11 @@ export function LoginPage() {
     );
   }
 
-  // If fully authenticated with both WorkOS and Convex, go to dashboard
+  // If fully authenticated with both WorkOS and Convex, restore intended route
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    const returnTo = sessionStorage.getItem(RETURN_TO_KEY) || "/";
+    sessionStorage.removeItem(RETURN_TO_KEY);
+    return <Navigate to={returnTo} replace />;
   }
 
   // Check if user is logged into WorkOS but Convex auth failed
