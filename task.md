@@ -97,9 +97,10 @@ None currently.
   - Click search results to preview session in slide-over panel (no navigation)
   - Full session details with message thread and syntax highlighting
   - Copy/Download/Public Link actions in panel header
-  - "Open in Dashboard" button for full view
+  - "Open in Dashboard" button for full view (deep links to Sessions tab with session selected)
   - Message highlighting when clicking message search results
   - Escape key and backdrop click to close
+  - Dashboard now reads ?session= URL param to auto-select session and switch to Sessions tab
 
 - [x] Documentation updates for local deployment and external links
   - Added Watch the demo link on Login page CTA (links to X demo video)

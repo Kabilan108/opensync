@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "../lib/auth";
 import { cn } from "../lib/utils";
 import { useTheme, getThemeClasses } from "../lib/theme";
@@ -57,6 +57,7 @@ export function DashboardPage() {
   const { user, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const t = getThemeClasses(theme);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [viewMode, setViewMode] = useState<ViewMode>("overview");
   const [selectedSessionId, setSelectedSessionId] = useState<Id<"sessions"> | null>(null);
   const [sortField, setSortField] = useState<SortField>("updatedAt");
@@ -73,6 +74,17 @@ export function DashboardPage() {
   useEffect(() => {
     getOrCreate();
   }, [getOrCreate]);
+
+  // Read session ID from URL param (e.g., from Context search "Open in Dashboard")
+  useEffect(() => {
+    const sessionParam = searchParams.get("session");
+    if (sessionParam) {
+      setSelectedSessionId(sessionParam as Id<"sessions">);
+      setViewMode("sessions");
+      // Clear the URL param for cleaner URL
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   // Convert sourceFilter to query arg (undefined means all)
   const sourceArg = sourceFilter === "all" ? undefined : sourceFilter;

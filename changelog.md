@@ -11,7 +11,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Slide-over panel for Context search results (click result to preview session without navigating away)
 - Session details panel with full message thread, syntax highlighting, copy/download actions
 - Message highlighting when clicking message search results (scrolls to and highlights the specific message)
-- "Open in Dashboard" button in slide-over to navigate to full dashboard view
+- "Open in Dashboard" button in slide-over to navigate to full dashboard view with session pre-selected
+- Deep linking support in Dashboard: reads ?session= URL param to auto-select session and switch to Sessions tab
 - Escape key and backdrop click to close slide-over panel
 - Watch the demo link on Login page CTA section (links to X demo video)
 - 100% local deployment instructions in OPENSYNC-SETUP.md docs (Convex local backend with Docker)
