@@ -91,6 +91,16 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 
 None currently.
 
+## Recently Completed (Auth Session Persistence)
+
+- [x] Fixed auth session persistence issue (GitHub #1)
+  - Users no longer need to sign in again on page refresh
+  - Direct navigation to protected routes now works
+  - Added dedicated CallbackHandler for OAuth code processing
+  - Added return-to URL preservation in sessionStorage
+  - Added devMode config for production session handling
+  - 10-second timeout on callback processing to prevent stuck states
+
 ## Recently Completed
 
 - [x] Context search slide-over panel for better UX

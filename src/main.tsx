@@ -9,17 +9,13 @@ import "./index.css";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL);
 
-// Storage key for preserving intended route across auth flow
-const RETURN_TO_KEY = "opensync_return_to";
-
 // Handle redirect after OAuth callback
-// Restores the user to their originally requested route
+// This is called by AuthKit after the authorization code exchange completes
+// We just clean the URL here - the actual navigation is handled by CallbackHandler
 const onRedirectCallback = () => {
-  const returnTo = sessionStorage.getItem(RETURN_TO_KEY) || "/";
-  sessionStorage.removeItem(RETURN_TO_KEY);
-  
-  // Navigate to the intended route (clean URL without OAuth params)
-  const cleanUrl = window.location.origin + returnTo;
+  // Just clean the URL params without navigating
+  // The CallbackHandler component handles the actual redirect
+  const cleanUrl = window.location.origin + window.location.pathname;
   window.history.replaceState({}, document.title, cleanUrl);
 };
 

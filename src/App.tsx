@@ -1,6 +1,7 @@
 import { useState, useEffect, type ReactNode } from "react";
-import { Routes, Route, Navigate, Link, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, Link, useLocation, useSearchParams } from "react-router-dom";
 import { useAuth } from "./lib/auth";
+import { useAuth as useAuthKit } from "@workos-inc/authkit-react";
 import { ThemeProvider } from "./lib/theme";
 import { LoginPage } from "./pages/Login";
 import { DashboardPage } from "./pages/Dashboard";
@@ -13,6 +14,53 @@ import { Loader2, ArrowLeft } from "lucide-react";
 
 // Storage key for preserving intended route across auth flow
 const RETURN_TO_KEY = "opensync_return_to";
+
+// Dedicated callback handler that waits for AuthKit to finish processing
+// before redirecting to the intended route
+function CallbackHandler() {
+  const { isLoading: workosLoading, user } = useAuthKit();
+  const { isLoading, isAuthenticated } = useAuth();
+  const [searchParams] = useSearchParams();
+  const [processingTimeout, setProcessingTimeout] = useState(false);
+
+  // Check if we have an authorization code in the URL
+  const hasCode = searchParams.has("code");
+
+  // Timeout after 10 seconds to prevent infinite loading
+  useEffect(() => {
+    if (hasCode) {
+      const timer = setTimeout(() => setProcessingTimeout(true), 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [hasCode]);
+
+  // If we have a code and are still loading, show processing state
+  if (hasCode && (workosLoading || isLoading) && !processingTimeout) {
+    return (
+      <div className="min-h-screen bg-[#0E0E0E] flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-6 w-6 animate-spin text-zinc-500 mx-auto" />
+          <p className="mt-2 text-xs text-zinc-600">Completing sign in...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If processing timed out, redirect to login
+  if (processingTimeout && !isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // If authenticated, redirect to saved route or home
+  if (isAuthenticated || user) {
+    const returnTo = sessionStorage.getItem(RETURN_TO_KEY) || "/";
+    sessionStorage.removeItem(RETURN_TO_KEY);
+    return <Navigate to={returnTo} replace />;
+  }
+
+  // No code and not authenticated, show login
+  return <LoginPage />;
+}
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { isLoading, isAuthenticated, user } = useAuth();
@@ -113,7 +161,7 @@ export default function App() {
     <ThemeProvider>
     <Routes>
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/callback" element={<LoginPage />} />
+      <Route path="/callback" element={<CallbackHandler />} />
       <Route path="/s/:slug" element={<PublicSessionPage />} />
       <Route path="/docs" element={<DocsPage />} />
       <Route

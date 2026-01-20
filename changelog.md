@@ -6,6 +6,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed auth session persistence: users no longer need to sign in again on page refresh (fixes #1)
+- Added dedicated CallbackHandler component for OAuth callback processing with 10s timeout
+- Added return-to URL preservation so users are redirected to their intended route after sign-in
+- Added devMode config to AuthKitProvider for proper production session handling
+- Improved callback flow: waits for both WorkOS and Convex auth to complete before redirecting
+
 ### Added
 
 - Slide-over panel for Context search results (click result to preview session without navigating away)
