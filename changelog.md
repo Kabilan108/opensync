@@ -6,6 +6,22 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Full Factory Droid (FD) support as third sync source alongside OpenCode and Claude Code
+- Source utilities file (src/lib/source.ts) with getSourceLabel and getSourceColorClass for consistent badge rendering
+- Factory Droid plugin card in Dashboard setup banner (3-column grid with OC, CC, FD)
+- Factory Droid stat card on Evals page showing FD session count
+- droid-sync link in Settings Plugin Setup section with GitHub and npm links
+- factoryDroid stats tracking in convex/evals.ts listEvalSessions query
+
+### Changed
+
+- Dashboard source badges now use centralized source utilities (FD shows orange badges)
+- Context page source badges refactored to use source utilities
+- Evals page SourceBadge component uses source utilities for consistent theming
+- Settings API key description updated to mention droid-sync alongside other plugins
+
 ## [1.0.0] - 2025-01-21
 
 ### Added

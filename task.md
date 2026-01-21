@@ -8,6 +8,18 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 
 - [ ] (add next task here)
 
+## Recently Completed (Factory Droid Full Integration)
+
+- [x] Full Factory Droid support as third sync source
+  - Created src/lib/source.ts with getSourceLabel and getSourceColorClass utilities
+  - Added factoryDroid stats tracking in convex/evals.ts (bySource.factoryDroid)
+  - Updated Context.tsx to use source utilities for badges
+  - Added Factory Droid plugin card in Dashboard setup banner (3-column grid)
+  - Refactored Dashboard source badges to use utilities (FD shows orange)
+  - Added Factory Droid stat card on Evals page
+  - Added droid-sync link in Settings Plugin Setup section
+  - Updated API key description to mention droid-sync
+
 ## Recently Completed (Ecosystem)
 
 - [x] Added droid-sync community plugin to README Ecosystem table
