@@ -129,7 +129,10 @@ When you push changelog.md changes to main:
 2. Parses the latest `## [X.X.X] - YYYY-MM-DD` version
 3. Extracts content between that version and the next `##`
 4. Creates a GitHub Release with tag `vX.X.X`
-5. Skips if that release already exists
+5. Creates a GitHub Discussion in the Changelog category
+6. Skips both if that release already exists
+
+**Important:** Only versioned sections trigger releases. `[Unreleased]` content is ignored until moved to a version.
 
 ## Example Entry
 

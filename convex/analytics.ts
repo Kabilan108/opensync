@@ -8,12 +8,23 @@ function filterBySource(sessions: any[], source?: string) {
   return sessions.filter((s) => (s.source || "opencode") === source);
 }
 
-// Helper to infer provider from model name when provider field is missing
-// This fixes GitHub issue #2: antigravity-oauth and anthropic-oauth showing as "unknown"
+// Helper to infer and normalize provider from session data
+// Fixes GitHub issue #2: antigravity-oauth and anthropic-oauth showing as "unknown"
 function inferProvider(session: { model?: string; provider?: string }): string {
-  // Return existing provider if set
-  if (session.provider) return session.provider;
+  // Normalize OAuth provider names to user-friendly display names
+  if (session.provider) {
+    const provider = session.provider.toLowerCase();
+    if (provider.includes("anthropic")) return "anthropic";
+    if (provider.includes("antigravity")) return "google"; // Google Antigravity platform
+    if (provider.includes("openai")) return "openai";
+    // Strip -oauth suffix for other OAuth providers
+    if (provider.endsWith("-oauth")) {
+      return provider.replace("-oauth", "");
+    }
+    return session.provider;
+  }
 
+  // Fall through to model-based inference when provider field is missing
   const model = (session.model || "").toLowerCase();
 
   // Anthropic/Claude models

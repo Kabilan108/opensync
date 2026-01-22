@@ -8,6 +8,26 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 
 - [ ] (add next task here)
 
+## Recently Completed (Daily Sync Wrapped - v1.2.0)
+
+- [x] Daily Sync Wrapped feature for visualizing past 24-hour coding activity
+  - Added Wrapped tab in Dashboard (5th view mode alongside Overview, Sessions, Evals, Analytics)
+  - Created 10 CSS template designs inspired by modern visual styles
+  - Google Imagen API integration for AI-generated wrapped images (requires GOOGLE_AI_API_KEY)
+  - CSS fallback templates when AI generation unavailable or no API key
+  - 24-hour countdown timer showing time until next generation (9:30 AM PT daily)
+  - Download as PNG button using html2canvas library
+  - Share to Twitter/X and LinkedIn buttons with pre-filled text
+  - Rotate Design test button for cycling through all 10 templates (marked for removal)
+  - Dark/tan theme support using useTheme and getThemeClasses
+  - User-specific data only (queries filter by authenticated user ID)
+  - No data state shows "No Activity Yet" message with countdown
+  - New Convex files: wrapped.ts, wrappedActions.ts, crons.ts
+  - New React components: WrappedView.tsx, WrappedTemplates.tsx
+  - New dailyWrapped table in schema with indexes (by_user_date, by_user, by_expires)
+  - Daily cron job at 9:30 AM PT generates wrapped for all active users
+  - Automatic cleanup of expired wrapped records every 6 hours
+
 ## Recently Completed (Empty Sessions Fix - Issue #7, #8)
 
 - [x] Fixed Claude Code assistant output not displaying in Dashboard (GitHub #7)
@@ -201,11 +221,12 @@ None currently.
 ## Recently Completed (Provider Display Fix)
 
 - [x] Fixed provider display showing "unknown" for antigravity-oauth and anthropic-oauth sessions (GitHub #2)
-  - Added inferProvider helper function to convex/analytics.ts
-  - Infers provider from model name when provider field is missing (anthropic, openai, google, mistral, cohere, meta, deepseek, groq)
+  - Updated inferProvider helper function in convex/analytics.ts with OAuth provider normalization
+  - OAuth provider mapping: antigravity-oauth to "google" (Google Antigravity platform), anthropic-oauth to "anthropic"
+  - Strips -oauth suffix from other OAuth providers for cleaner display
+  - Falls through to model-based inference when provider field is missing (anthropic, openai, google, mistral, cohere, meta, deepseek, groq)
   - Applied consistently in providerStats query, sessionsWithDetails filtering, and session list return values
   - Filter dropdown and provider chart now show correct provider names
-  - Backward compatible: preserves existing provider values, only infers when missing
 
 ## Recently Completed (Auth Session Persistence)
 

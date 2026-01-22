@@ -154,4 +154,37 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_user_created", ["userId", "createdAt"]),
+
+  // Daily Wrapped images - AI-generated visualization of 24h activity
+  dailyWrapped: defineTable({
+    userId: v.id("users"),
+    date: v.string(), // "2026-01-22" format
+    designIndex: v.number(), // 0-9 for template rotation
+    imageStorageId: v.optional(v.id("_storage")), // Generated image
+    generatedAt: v.number(), // timestamp
+    expiresAt: v.number(), // timestamp (24h later)
+    // Snapshot of data at generation time
+    stats: v.object({
+      totalTokens: v.number(),
+      promptTokens: v.number(),
+      completionTokens: v.number(),
+      totalMessages: v.number(),
+      cost: v.number(),
+      topModels: v.array(
+        v.object({
+          model: v.string(),
+          tokens: v.number(),
+        })
+      ),
+      topProviders: v.array(
+        v.object({
+          provider: v.string(),
+          tokens: v.number(),
+        })
+      ),
+    }),
+  })
+    .index("by_user_date", ["userId", "date"])
+    .index("by_user", ["userId"])
+    .index("by_expires", ["expiresAt"]),
 });

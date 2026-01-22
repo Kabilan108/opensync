@@ -8,6 +8,7 @@ import { getSourceLabel, getSourceColorClass } from "../lib/source";
 import { useTheme, getThemeClasses } from "../lib/theme";
 import { StatCard, BarChart, DonutChart, FilterPill, ProgressBar, ConsumptionBreakdown } from "../components/Charts";
 import { ConfirmModal } from "../components/ConfirmModal";
+import { WrappedView } from "../components/WrappedView";
 import type { Id } from "../../convex/_generated/dataModel";
 import {
   Search,
@@ -48,7 +49,7 @@ import {
 } from "lucide-react";
 
 // View modes
-type ViewMode = "overview" | "sessions" | "evals" | "analytics";
+type ViewMode = "overview" | "sessions" | "evals" | "analytics" | "wrapped";
 type SortField = "updatedAt" | "createdAt" | "totalTokens" | "cost" | "durationMs";
 type SortOrder = "asc" | "desc";
 // Source filter type for filtering by plugin source
@@ -198,7 +199,7 @@ export function DashboardPage() {
 
         {/* View toggles - scrollable on mobile */}
         <div className={cn("flex items-center gap-1 rounded-md p-0.5 border overflow-x-auto scrollbar-hide", t.bgToggle, t.border)}>
-          {(["overview", "sessions", "evals", "analytics"] as const).map((mode) => (
+          {(["overview", "sessions", "evals", "analytics", "wrapped"] as const).map((mode) => (
             <button
               key={mode}
               onClick={() => setViewMode(mode)}
@@ -360,6 +361,10 @@ export function DashboardPage() {
             providerStats={providerStats || []}
             theme={theme}
           />
+        )}
+
+        {viewMode === "wrapped" && (
+          <WrappedView />
         )}
       </main>
 

@@ -6,6 +6,31 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-01-22
+
+### Added
+
+- Daily Sync Wrapped feature: AI-generated visualization of past 24-hour coding activity
+  - New Wrapped tab in Dashboard (5th view mode alongside Overview, Sessions, Evals, Analytics)
+  - 10 CSS template designs inspired by modern visual styles (minimal dark, gradient noise, geometric, tech cards, bold typography, vinyl record, orange gradient, dark minimal, blue landscape, color shapes)
+  - Google Imagen API integration for AI-generated wrapped images
+  - CSS fallback templates when AI generation unavailable
+  - 24-hour countdown timer showing time until next generation
+  - Download as PNG button using html2canvas
+  - Share to Twitter/X and LinkedIn buttons
+  - Rotate Design button for testing different template styles
+  - Daily cron job at 9:30 AM PT generates wrapped for all active users
+  - Automatic cleanup of expired wrapped records every 6 hours
+- New convex/wrapped.ts with queries (getTodayWrapped, getWrappedStats, get24HourStats, getCountdownInfo), mutations (createWrapped, deleteExpired), and actions (generateWrappedImage, generateForUser, generateAllWrapped)
+- New convex/crons.ts for scheduled wrapped generation and cleanup
+- New dailyWrapped table in schema with indexes (by_user_date, by_user, by_expires)
+- html2canvas dependency for client-side PNG export
+
+### Changed
+
+- Dashboard ViewMode type now includes "wrapped" as 5th option
+- Dashboard view toggles updated to include Wrapped tab
+
 ## [1.1.0] - 2025-01-21
 
 ### Added
@@ -218,7 +243,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Updated embeddings:store to use replace pattern instead of delete+insert
 - Added idempotency checks with early returns when no meaningful changes detected
 - Fixed provider display showing "unknown" for antigravity-oauth and anthropic-oauth sessions (fixes #2)
-- Added inferProvider helper to derive provider from model name when provider field is missing
+- Added OAuth provider normalization to inferProvider helper: antigravity-oauth maps to "google" (Google Antigravity platform), anthropic-oauth maps to "anthropic"
+- Strips -oauth suffix from other OAuth provider names for cleaner display
 - Applied provider inference consistently in providerStats, sessionsWithDetails query, and filter logic
 - Fixed auth session persistence: users no longer need to sign in again on page refresh (fixes #1)
 - Added dedicated CallbackHandler component for OAuth callback processing with 10s timeout
