@@ -98,6 +98,7 @@ Documentation files.
 | `add-package-to-home-prompt.md` | Reusable prompt template for adding CLI/npm packages to homepage Getting Started section |
 | `WORKOS-AUTH.md` | WorkOS AuthKit integration architecture and security model |
 | `NETLIFY-WORKOS-DEPLOYMENT.md` | Deployment guide for Netlify, WorkOS, and Convex integration |
+| `fix-blank-sessions.md` | Tracking document for empty session messages fix (Issues #7, #8) |
 
 ## public/
 

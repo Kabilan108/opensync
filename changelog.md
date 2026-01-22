@@ -6,22 +6,27 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.1.0] - 2025-01-21
+
 ### Added
 
 - Full Factory Droid (FD) support as third sync source alongside OpenCode and Claude Code
-
-### Fixed
-
-- Fixed Claude Code assistant output not displaying in Dashboard session viewer (fixes #7)
-- MessageBubble component now properly extracts text from object formats (`{ text: "..." }` or `{ content: "..." }`)
-- Added content normalization helpers (getPartTextContent, getToolName) to handle different plugin formats
-- Added tool-result part type rendering to Dashboard MessageBubble (was missing)
-- Added fallback to message.textContent when parts have no displayable content
 - Source utilities file (src/lib/source.ts) with getSourceLabel and getSourceColorClass for consistent badge rendering
 - Factory Droid plugin card in Dashboard setup banner (3-column grid with OC, CC, FD)
 - Factory Droid stat card on Evals page showing FD session count
 - droid-sync link in Settings Plugin Setup section with GitHub and npm links
 - factoryDroid stats tracking in convex/evals.ts listEvalSessions query
+- Content normalization helpers (getPartTextContent, getToolName) to handle different plugin formats
+- tool-result part type rendering to Dashboard MessageBubble
+
+### Fixed
+
+- Claude Code assistant output not displaying in Dashboard session viewer (fixes #7)
+- MessageBubble component now properly extracts text from object formats (`{ text: "..." }` or `{ content: "..." }`)
+- textContent fallback when parts have no displayable content
+- Empty assistant messages on sessions with tool-calling chains (fixes #8)
+- hasDisplayableParts/hasPartsContent now checks tool-call and tool-result content, not just type existence
+- Applied fix across all 4 message rendering components (Dashboard, SessionViewer, Context, PublicSession)
 
 ### Changed
 

@@ -8,7 +8,7 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 
 - [ ] (add next task here)
 
-## Recently Completed (Claude Code Output Display Fix)
+## Recently Completed (Empty Sessions Fix - Issue #7, #8)
 
 - [x] Fixed Claude Code assistant output not displaying in Dashboard (GitHub #7)
   - MessageBubble component was rendering object content directly instead of extracting text
@@ -17,6 +17,13 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
   - Added hasDisplayableParts check to detect if parts have actual content
   - Added textContent fallback when parts are empty
   - Added tool-result part type rendering (was missing from MessageBubble)
+
+- [x] Fixed empty assistant messages on sessions with tool-calling chains (GitHub #8)
+  - hasDisplayableParts/hasPartsContent was only checking part TYPE, not content
+  - Now validates tool-call parts have extractable name (content.name or content.toolName)
+  - Now validates tool-result parts have extractable result (content.result, content.output, or content itself)
+  - Applied fix to all 4 message rendering components: Dashboard.tsx, SessionViewer.tsx, Context.tsx, PublicSession.tsx
+  - Created docs/fix-blank-sessions.md tracking document
 
 ## Recently Completed (Factory Droid Full Integration)
 

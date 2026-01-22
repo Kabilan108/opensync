@@ -988,13 +988,22 @@ function SlideOverMessageBlock({
   const isUser = message.role === "user";
   const isSystem = message.role === "system";
 
-  // Check if parts have any displayable content
+  // Check if parts have any displayable content (text, tool-call, or tool-result with actual data)
   const hasPartsContent = message.parts?.some((part: any) => {
     if (part.type === "text") {
       const text = getTextContentFromPart(part.content);
       return text && text.trim().length > 0;
     }
-    return part.type === "tool-call" || part.type === "tool-result";
+    if (part.type === "tool-call") {
+      // Check if tool-call has extractable name
+      return part.content && (part.content.name || part.content.toolName);
+    }
+    if (part.type === "tool-result") {
+      // Check if tool-result has extractable result
+      const result = part.content?.result || part.content?.output || part.content;
+      return result !== null && result !== undefined;
+    }
+    return false;
   });
 
   // Use textContent as fallback if no parts have content
