@@ -6,8 +6,6 @@ import { useTheme, getThemeClasses } from "../lib/theme";
 import { cn } from "../lib/utils";
 import {
   Download,
-  Twitter,
-  Linkedin,
   RotateCcw,
   Clock,
   Loader2,
@@ -66,7 +64,7 @@ export function WrappedView() {
     setTestDesignIndex((prev) => ((prev ?? designIndex) + 1) % TEMPLATE_COUNT);
   }, [designIndex]);
 
-  // Download as PNG using html2canvas
+  // Download as PNG using html2canvas (9:16 portrait: 675x1200)
   const handleDownload = useCallback(async () => {
     if (!wrappedRef.current) return;
 
@@ -76,11 +74,11 @@ export function WrappedView() {
       const html2canvas = (await import("html2canvas")).default;
 
       const canvas = await html2canvas(wrappedRef.current, {
-        scale: 2, // Higher resolution
+        scale: 1, // 1:1 scale since we render at exact size
         useCORS: true,
         backgroundColor: null,
-        width: 1080,
-        height: 1920,
+        width: 675,
+        height: 1200,
       });
 
       // Create download link
@@ -94,21 +92,6 @@ export function WrappedView() {
       setIsExporting(false);
     }
   }, [date]);
-
-  // Share to Twitter/X
-  const handleShareTwitter = useCallback(() => {
-    const text = encodeURIComponent(
-      `My Daily Sync Wrapped\n\n${stats?.totalTokens.toLocaleString() || 0} tokens synced today\n${stats?.totalMessages || 0} messages\n\nBuilt with @OpenSyncDev`
-    );
-    const url = encodeURIComponent("https://opensync.dev");
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank");
-  }, [stats]);
-
-  // Share to LinkedIn
-  const handleShareLinkedIn = useCallback(() => {
-    const url = encodeURIComponent("https://opensync.dev");
-    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, "_blank");
-  }, []);
 
   // Loading state
   if (stats === undefined) {
@@ -154,10 +137,10 @@ export function WrappedView() {
           </span>
         </div>
 
-        {/* Wrapped Image Container - 9:16 aspect ratio */}
+        {/* Wrapped Image Container - 9:16 portrait aspect ratio (675x1200) */}
         <div
           className={cn("relative rounded-2xl overflow-hidden shadow-2xl", t.bgSecondary)}
-          style={{ width: "min(100%, 360px)", aspectRatio: "9/16" }}
+          style={{ width: "min(100%, 337px)", aspectRatio: "9/16" }}
         >
           {/* AI Generated Image */}
           {hasAIImage && testDesignIndex === null ? (
@@ -167,13 +150,13 @@ export function WrappedView() {
               className="w-full h-full object-cover"
             />
           ) : (
-            /* CSS Fallback Template */
+            /* CSS Fallback Template - 675x1200 rendered at 0.5 scale for preview */
             <div
               ref={wrappedRef}
               className="w-full h-full"
-              style={{ width: "1080px", height: "1920px", transform: "scale(0.333)", transformOrigin: "top left" }}
+              style={{ width: "675px", height: "1200px", transform: "scale(0.5)", transformOrigin: "top left" }}
             >
-              <div style={{ width: "1080px", height: "1920px" }}>
+              <div style={{ width: "675px", height: "1200px" }}>
                 <WrappedTemplate
                   designIndex={designIndex}
                   stats={stats}
@@ -299,24 +282,6 @@ export function WrappedView() {
             )}
             Download PNG
           </button>
-
-          {/* Share buttons */}
-          <div className="flex gap-3">
-            <button
-              onClick={handleShareTwitter}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-black text-white rounded-xl font-medium hover:bg-zinc-800 transition-colors"
-            >
-              <Twitter className="w-5 h-5" />
-              Share
-            </button>
-            <button
-              onClick={handleShareLinkedIn}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#0077b5] text-white rounded-xl font-medium hover:bg-[#006699] transition-colors"
-            >
-              <Linkedin className="w-5 h-5" />
-              Share
-            </button>
-          </div>
 
           {/* 
             TEST BUTTON - REMOVE LATER

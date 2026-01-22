@@ -8,6 +8,22 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 
 - [ ] (add next task here)
 
+## Recently Completed (Wrapped Image Fixes)
+
+- [x] Fixed Daily Sync Wrapped image dimensions for social media
+  - Changed from 1080x1920 to 675x1200 (9:16 portrait)
+  - Updated html2canvas export settings for exact pixel dimensions
+  - Updated preview container with correct aspect ratio (9/16)
+- [x] Increased font sizes across all 10 wrapped templates
+  - Headlines: text-5xl to text-8xl
+  - Stats numbers: text-4xl to text-7xl  
+  - Labels: text-lg to text-2xl
+  - All templates redesigned for vertical portrait layout
+- [x] Removed share buttons from Wrapped view
+  - Removed Twitter/X share button
+  - Removed LinkedIn share button
+  - Kept download PNG and rotate design buttons only
+
 ## Recently Completed (Daily Sync Wrapped - v1.2.0)
 
 - [x] Daily Sync Wrapped feature for visualizing past 24-hour coding activity

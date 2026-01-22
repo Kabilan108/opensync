@@ -6,6 +6,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- Daily Sync Wrapped images now export at 9:16 portrait (675x1200 pixels) for social media compatibility
+- Increased font sizes across all 10 wrapped templates for better readability
+- Removed Twitter/X and LinkedIn share buttons from Wrapped view (download only)
+- Updated wrapped templates with vertical portrait layouts and large typography
+
 ## [1.2.0] - 2026-01-22
 
 ### Added
