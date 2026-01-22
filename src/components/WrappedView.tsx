@@ -152,11 +152,10 @@ export function WrappedView() {
           ) : (
             /* CSS Fallback Template - 675x1200 rendered at 0.5 scale for preview */
             <div
-              ref={wrappedRef}
               className="w-full h-full"
               style={{ width: "675px", height: "1200px", transform: "scale(0.5)", transformOrigin: "top left" }}
             >
-              <div style={{ width: "675px", height: "1200px" }}>
+              <div ref={wrappedRef} style={{ width: "675px", height: "1200px" }}>
                 <WrappedTemplate
                   designIndex={designIndex}
                   stats={stats}
