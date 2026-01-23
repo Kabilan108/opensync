@@ -8,6 +8,15 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 
 - [ ] (add next task here)
 
+## Recently Completed (Delete All Data Fix - Issue #17)
+
+- [x] Fixed deleteAllData mutation failing with Server Error (GitHub #17)
+  - Added missing messageEmbeddings table deletion
+  - Added missing dailyWrapped table deletion
+  - Converted sequential deletes to parallel using Promise.all
+  - Updated return validators to include sessionEmbeddings, messageEmbeddings, dailyWrapped
+  - Renamed `embeddings` to `sessionEmbeddings` in return type for clarity
+
 ## Recently Completed (Session Transition Fix)
 
 - [x] Fixed session panel flashing when switching between sessions in Dashboard

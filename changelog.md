@@ -6,6 +6,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed deleteAllData mutation failing with Server Error (GitHub #17)
+  - Added missing messageEmbeddings table deletion (was not being cleaned up)
+  - Added missing dailyWrapped table deletion (was not being cleaned up)
+  - Converted sequential deletes to parallel using Promise.all (prevents timeout)
+  - Updated return type from `embeddings` to `sessionEmbeddings` plus new `messageEmbeddings` and `dailyWrapped` counts
+
 ### Changed
 
 - Daily Sync Wrapped images now export at 9:16 portrait (675x1200 pixels) for social media compatibility

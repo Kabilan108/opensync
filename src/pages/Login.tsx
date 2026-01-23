@@ -129,10 +129,10 @@ function PlatformLeaderboard({ isDark }: { isDark: boolean }) {
   const topSources = platformStats?.topSources ?? [];
 
   return (
-    <div className={`mt-8 rounded-lg border p-4 ${
+    <div className={`mt-10 rounded-lg border p-5 ${
       isDark ? "border-zinc-800 bg-[#161616]" : "border-[#e6e4e1] bg-[#f5f3f0]"
     }`}>
-      <h3 className={`text-sm font-medium mb-4 flex items-center gap-2 ${
+      <h3 className={`text-sm font-medium mb-5 flex items-center gap-2 ${
         isDark ? "text-zinc-300" : "text-[#1a1a1a]"
       }`}>
         <Zap className={`h-4 w-4 ${isDark ? "text-zinc-500" : "text-[#8b7355]"}`} />
@@ -142,13 +142,13 @@ function PlatformLeaderboard({ isDark }: { isDark: boolean }) {
         </span>
       </h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         
         {/* Top Models */}
-        <div className={`rounded-md border p-3 ${
+        <div className={`rounded-md border p-4 ${
           isDark ? "border-zinc-800 bg-[#0E0E0E]" : "border-[#e6e4e1] bg-[#faf8f5]"
         }`}>
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-1.5">
               <Trophy className={`h-3 w-3 ${isDark ? "text-amber-500" : "text-amber-600"}`} />
               <p className={`text-[10px] uppercase tracking-wider ${
@@ -195,10 +195,10 @@ function PlatformLeaderboard({ isDark }: { isDark: boolean }) {
         </div>
 
         {/* Top CLI (sources: opencode, claude-code, cursor, droid, codex, amp, etc.) */}
-        <div className={`rounded-md border p-3 ${
+        <div className={`rounded-md border p-4 ${
           isDark ? "border-zinc-800 bg-[#0E0E0E]" : "border-[#e6e4e1] bg-[#faf8f5]"
         }`}>
-          <div className="flex items-center gap-1.5 mb-2">
+          <div className="flex items-center gap-1.5 mb-3">
             <Zap className={`h-3 w-3 ${isDark ? "text-blue-400" : "text-[#EB5601]"}`} />
             <p className={`text-[10px] uppercase tracking-wider ${
               isDark ? "text-zinc-600" : "text-[#8b7355]"
@@ -273,10 +273,10 @@ export function LoginPage() {
           : "bg-[radial-gradient(ellipse_at_top,_rgba(139,115,85,0.03),_transparent_50%)]"
       }`} />
 
-      <div className="relative mx-auto flex min-h-screen max-w-6xl flex-col px-6 py-8">
+      <div className="relative mx-auto flex min-h-screen max-w-6xl flex-col px-6 py-12 lg:py-20">
         {/* Main content */}
         <main className="flex flex-1 items-center">
-          <div className="grid w-full gap-12 lg:grid-cols-2 lg:gap-16">
+          <div className="grid w-full gap-16 lg:grid-cols-2 lg:gap-24">
             {/* Left side: ASCII logo and text */}
             <div className="flex flex-col justify-center">
               {/* ASCII Logo */}
@@ -285,15 +285,15 @@ export function LoginPage() {
               </pre>
 
               {/* Tagline */}
-              <h2 className={`mt-6 text-lg font-medium sm:text-xl ${isDark ? "text-zinc-200" : "text-[#1a1a1a]"}`}>
+              <h2 className={`mt-8 text-lg font-medium sm:text-xl ${isDark ? "text-zinc-200" : "text-[#1a1a1a]"}`}>
                 Dashboards for OpenCode and Claude coding sessions
               </h2>
-              <p className={`mt-2 text-sm sm:text-base ${isDark ? "text-zinc-300" : "text-[#1a1a1a]"}`}>
+              <p className={`mt-3 text-sm sm:text-base leading-relaxed ${isDark ? "text-zinc-300" : "text-[#1a1a1a]"}`}>
                 Cloud-synced dashboards that track session activity, tool usage, and token spend. Build eval datasets across projects.
               </p>
 
               {/* Feature list - colors from VSCode TypeScript theme */}
-              <div className={`mt-6 space-y-2 text-sm ${isDark ? "text-zinc-500" : "text-[#6b6b6b]"}`}>
+              <div className={`mt-10 space-y-3 text-sm ${isDark ? "text-zinc-500" : "text-[#6b6b6b]"}`}>
                 <p>
                   <span className={`font-mono ${isDark ? "text-[#c586c0]" : "text-[#9b4d96]"}`}>Sync</span> sessions from CLI
                   to cloud
@@ -320,7 +320,7 @@ export function LoginPage() {
               {/* CTA - different buttons based on auth state */}
               {isAuthenticated ? (
                 // Logged in: show dashboard link
-                <div className="mt-8 flex flex-wrap gap-3">
+                <div className="mt-10 flex flex-wrap gap-3">
                   <a
                     href="/dashboard"
                     className={`w-fit rounded-md border px-6 py-2.5 text-sm font-medium transition-colors ${
@@ -354,7 +354,7 @@ export function LoginPage() {
                 </div>
               ) : authSyncIssue ? (
                 // WorkOS user but Convex sync failed
-                <div className="mt-8 space-y-3">
+                <div className="mt-10 space-y-3">
                   <div className={`rounded-md border px-4 py-3 ${
                     isDark 
                       ? "border-amber-800/50 bg-amber-900/20" 
@@ -392,7 +392,7 @@ export function LoginPage() {
                 </div>
               ) : (
                 // Not logged in: show sign in
-                <div className="mt-8 flex flex-wrap gap-3">
+                <div className="mt-10 flex flex-wrap gap-3">
                   <button
                     onClick={signIn}
                     className={`w-fit rounded-md border px-6 py-2.5 text-sm font-medium transition-colors ${
@@ -429,7 +429,7 @@ export function LoginPage() {
               )}
 
               {/* Export formats */}
-              <div className={`mt-6 flex flex-wrap gap-4 text-xs ${isDark ? "text-zinc-600" : "text-[#8b7355]"}`}>
+              <div className={`mt-8 flex flex-wrap gap-4 text-xs ${isDark ? "text-zinc-600" : "text-[#8b7355]"}`}>
                 <span>JSON</span>
                 <span>JSONL</span>
                 <span>Markdown</span>
@@ -437,7 +437,7 @@ export function LoginPage() {
               </div>
 
               {/* Trust message */}
-              <div className={`mt-6 rounded-md border px-4 py-3 ${
+              <div className={`mt-8 rounded-md border px-5 py-4 ${
                 isDark 
                   ? "border-zinc-800 bg-zinc-900/50" 
                   : "border-[#e6e4e1] bg-[#f5f3f0]"
@@ -466,7 +466,7 @@ export function LoginPage() {
             </div>
 
             {/* Right side: Mini dashboard mock (desktop only) + Getting started (all screens) */}
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-8">
               {/* Dashboard preview - desktop only */}
               <div className={`hidden lg:block overflow-hidden rounded-lg border ${
                 isDark ? "border-zinc-800 bg-[#161616]" : "border-[#e6e4e1] bg-[#f5f3f0]"
@@ -546,8 +546,8 @@ export function LoginPage() {
                   </div>
 
                   {/* Main panel */}
-                  <div className="flex-1 p-4">
-                    <div className="mb-4 flex items-center justify-between">
+                  <div className="flex-1 p-5">
+                    <div className="mb-5 flex items-center justify-between">
                       <div>
                         <p className={`text-sm font-medium ${isDark ? "text-zinc-300" : "text-[#1a1a1a]"}`}>
                           auth-flow-setup
@@ -612,13 +612,13 @@ export function LoginPage() {
               </div>
 
               {/* Syncs with section */}
-              <div className={`rounded-lg border p-4 ${
+              <div className={`rounded-lg border p-5 ${
                 isDark ? "border-zinc-800 bg-[#161616]" : "border-[#e6e4e1] bg-[#f5f3f0]"
               }`}>
-                <h3 className={`text-sm font-medium mb-4 ${isDark ? "text-zinc-300" : "text-[#1a1a1a]"}`}>
+                <h3 className={`text-sm font-medium mb-5 ${isDark ? "text-zinc-300" : "text-[#1a1a1a]"}`}>
                   Syncs with
                 </h3>
-                <div className="flex items-end justify-center gap-6 flex-wrap">
+                <div className="flex items-end justify-center gap-8 flex-wrap">
                   {/* OpenCode */}
                   <div className="flex flex-col items-center gap-1.5" title="OpenCode">
                     <img
@@ -686,17 +686,17 @@ export function LoginPage() {
               </div>
 
               {/* Getting started section */}
-              <div className={`rounded-lg border p-4 ${
+              <div className={`rounded-lg border p-5 ${
                 isDark ? "border-zinc-800 bg-[#161616]" : "border-[#e6e4e1] bg-[#f5f3f0]"
               }`}>
                 <h3 className={`text-sm font-medium ${isDark ? "text-zinc-300" : "text-[#1a1a1a]"}`}>
                   Getting started
                 </h3>
-                <p className={`mt-2 text-[11px] ${isDark ? "text-zinc-500" : "text-[#6b6b6b]"}`}>
+                <p className={`mt-3 text-[11px] ${isDark ? "text-zinc-500" : "text-[#6b6b6b]"}`}>
                   Install one of the sync plugins to send session data to your dashboard.
                 </p>
 
-                <div className="mt-3 space-y-2">
+                <div className="mt-4 space-y-3">
                   {/* Claude Code Sync */}
                   <a
                     href="https://www.npmjs.com/package/claude-code-sync"
@@ -785,7 +785,7 @@ export function LoginPage() {
         </main>
 
         {/* Footer */}
-        <footer className={`mt-8 flex flex-col items-center gap-3 text-xs ${isDark ? "text-zinc-600" : "text-[#8b7355]"}`}>
+        <footer className={`mt-12 flex flex-col items-center gap-4 text-xs ${isDark ? "text-zinc-600" : "text-[#8b7355]"}`}>
           <a
             href="https://github.com/waynesutton/opensync"
             target="_blank"
@@ -794,9 +794,9 @@ export function LoginPage() {
           >
             Open Source project
           </a>
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-3">
             <span>built with</span>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <a
                 href="https://convex.dev/docs"
                 target="_blank"

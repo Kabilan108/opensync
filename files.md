@@ -26,7 +26,7 @@ Backend functions and schema.
 | `schema.ts` | Database schema: users (with enabledAgents for CLI tool preferences), sessions (with eval fields: evalReady, reviewedAt, evalNotes, evalTags), messages, parts, sessionEmbeddings, messageEmbeddings, apiLogs, dailyWrapped (for Daily Sync Wrapped feature with 24h expiry) |
 | `auth.config.ts` | WorkOS JWT validation configuration |
 | `convex.config.ts` | Convex app configuration |
-| `users.ts` | User queries/mutations: getOrCreate, me (returns enabledAgents), stats, API key management, updateEnabledAgents, deleteAllData, deleteAccount (deletes Convex first, then WorkOS to prevent partial deletion) |
+| `users.ts` | User queries/mutations: getOrCreate, me (returns enabledAgents), stats, API key management, updateEnabledAgents, deleteAllData (parallel deletes for all 7 tables: parts, messages, sessions, sessionEmbeddings, messageEmbeddings, dailyWrapped, apiLogs), deleteAccount (deletes Convex first, then WorkOS to prevent partial deletion) |
 | `sessions.ts` | Session CRUD: list, get, getPublic, setVisibility, remove, getMarkdown, upsert (with 10s dedup window, idempotency), batchUpsert, listExternalIds, exportAllDataCSV |
 | `messages.ts` | Message mutations: upsert (with 5s dedup, combined session patch, parallel parts ops), batchUpsert for bulk sync |
 | `analytics.ts` | Analytics queries with source filtering: dailyStats, modelStats, projectStats, providerStats, summaryStats, sessionsWithDetails, sourceStats, publicPlatformStats (no auth, for homepage leaderboard). Includes inferProvider helper with OAuth provider normalization (antigravity-oauth to google, anthropic-oauth to anthropic) and model-based provider detection |

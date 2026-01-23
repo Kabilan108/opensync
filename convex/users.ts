@@ -235,14 +235,16 @@ export const getByWorkosId = internalMutation({
 });
 
 // Delete all user data (keeps account intact)
-// Deletes: parts, messages, sessionEmbeddings, sessions, apiLogs
+// Deletes: parts, messages, sessionEmbeddings, messageEmbeddings, dailyWrapped, sessions, apiLogs
 export const deleteAllData = mutation({
   args: {},
   returns: v.object({ deleted: v.boolean(), counts: v.object({
     sessions: v.number(),
     messages: v.number(),
     parts: v.number(),
-    embeddings: v.number(),
+    sessionEmbeddings: v.number(),
+    messageEmbeddings: v.number(),
+    dailyWrapped: v.number(),
     apiLogs: v.number(),
   })}),
   handler: async (ctx) => {
@@ -270,7 +272,9 @@ export const deleteAllDataInternal = internalMutation({
     sessions: v.number(),
     messages: v.number(),
     parts: v.number(),
-    embeddings: v.number(),
+    sessionEmbeddings: v.number(),
+    messageEmbeddings: v.number(),
+    dailyWrapped: v.number(),
     apiLogs: v.number(),
   }),
   handler: async (ctx, { userId, deleteUser }) => {
@@ -285,13 +289,15 @@ export const deleteAllDataInternal = internalMutation({
   },
 });
 
-// Helper function to delete all user data
+// Helper function to delete all user data with parallel deletes for performance
 async function deleteUserData(ctx: any, userId: any) {
   const counts = {
     sessions: 0,
     messages: 0,
     parts: 0,
-    embeddings: 0,
+    sessionEmbeddings: 0,
+    messageEmbeddings: 0,
+    dailyWrapped: 0,
     apiLogs: 0,
   };
 
@@ -301,7 +307,10 @@ async function deleteUserData(ctx: any, userId: any) {
     .withIndex("by_user", (q: any) => q.eq("userId", userId))
     .collect();
 
-  // Delete parts and messages for each session
+  // Collect all message IDs and part IDs first, then delete in parallel
+  const allMessageIds: any[] = [];
+  const allPartIds: any[] = [];
+
   for (const session of sessions) {
     const messages = await ctx.db
       .query("messages")
@@ -309,47 +318,79 @@ async function deleteUserData(ctx: any, userId: any) {
       .collect();
 
     for (const message of messages) {
-      // Delete parts for this message
+      allMessageIds.push(message._id);
+
       const parts = await ctx.db
         .query("parts")
         .withIndex("by_message", (q: any) => q.eq("messageId", message._id))
         .collect();
 
       for (const part of parts) {
-        await ctx.db.delete(part._id);
-        counts.parts++;
+        allPartIds.push(part._id);
       }
-
-      // Delete the message
-      await ctx.db.delete(message._id);
-      counts.messages++;
     }
-
-    // Delete the session
-    await ctx.db.delete(session._id);
-    counts.sessions++;
   }
 
-  // Delete session embeddings
-  const embeddings = await ctx.db
+  // Delete parts in parallel (child records first)
+  if (allPartIds.length > 0) {
+    await Promise.all(allPartIds.map((id) => ctx.db.delete(id)));
+    counts.parts = allPartIds.length;
+  }
+
+  // Delete messages in parallel
+  if (allMessageIds.length > 0) {
+    await Promise.all(allMessageIds.map((id) => ctx.db.delete(id)));
+    counts.messages = allMessageIds.length;
+  }
+
+  // Delete sessions in parallel
+  if (sessions.length > 0) {
+    await Promise.all(sessions.map((s: any) => ctx.db.delete(s._id)));
+    counts.sessions = sessions.length;
+  }
+
+  // Delete session embeddings in parallel
+  const sessionEmbeddings = await ctx.db
     .query("sessionEmbeddings")
     .withIndex("by_user", (q: any) => q.eq("userId", userId))
     .collect();
 
-  for (const embedding of embeddings) {
-    await ctx.db.delete(embedding._id);
-    counts.embeddings++;
+  if (sessionEmbeddings.length > 0) {
+    await Promise.all(sessionEmbeddings.map((e: any) => ctx.db.delete(e._id)));
+    counts.sessionEmbeddings = sessionEmbeddings.length;
   }
 
-  // Delete API logs
+  // Delete message embeddings in parallel
+  const messageEmbeddings = await ctx.db
+    .query("messageEmbeddings")
+    .withIndex("by_user", (q: any) => q.eq("userId", userId))
+    .collect();
+
+  if (messageEmbeddings.length > 0) {
+    await Promise.all(messageEmbeddings.map((e: any) => ctx.db.delete(e._id)));
+    counts.messageEmbeddings = messageEmbeddings.length;
+  }
+
+  // Delete daily wrapped images in parallel
+  const dailyWrappeds = await ctx.db
+    .query("dailyWrapped")
+    .withIndex("by_user", (q: any) => q.eq("userId", userId))
+    .collect();
+
+  if (dailyWrappeds.length > 0) {
+    await Promise.all(dailyWrappeds.map((d: any) => ctx.db.delete(d._id)));
+    counts.dailyWrapped = dailyWrappeds.length;
+  }
+
+  // Delete API logs in parallel
   const apiLogs = await ctx.db
     .query("apiLogs")
     .withIndex("by_user", (q: any) => q.eq("userId", userId))
     .collect();
 
-  for (const log of apiLogs) {
-    await ctx.db.delete(log._id);
-    counts.apiLogs++;
+  if (apiLogs.length > 0) {
+    await Promise.all(apiLogs.map((l: any) => ctx.db.delete(l._id)));
+    counts.apiLogs = apiLogs.length;
   }
 
   return counts;
