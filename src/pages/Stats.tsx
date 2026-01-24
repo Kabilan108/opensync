@@ -1,5 +1,5 @@
 import { useState, useEffect, Component, type ReactNode } from "react";
-import { useQuery } from "convex/react";
+import { useConvex } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Link } from "react-router-dom";
 import { useTheme, type Theme } from "../lib/theme";
@@ -43,9 +43,137 @@ function getNextMilestone(count: number): { target: number; previous: number } {
   return { target, previous: prev };
 }
 
+function getPTOffsetMinutes(date: Date): number {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Los_Angeles",
+    timeZoneName: "shortOffset",
+  }).formatToParts(date);
+  const tzPart = parts.find((part) => part.type === "timeZoneName")?.value;
+  const match = tzPart?.match(/GMT([+-]\d{1,2})(?::(\d{2}))?/);
+  if (!match) return 0;
+  const hours = Number(match[1]);
+  const minutes = match[2] ? Number(match[2]) : 0;
+  return hours * 60 + (hours >= 0 ? minutes : -minutes);
+}
+
+function getPTDateParts(date: Date) {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Los_Angeles",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+  const parts = formatter.formatToParts(date);
+  const getValue = (type: string) =>
+    Number(parts.find((part) => part.type === type)?.value ?? 0);
+  return {
+    year: getValue("year"),
+    month: getValue("month"),
+    day: getValue("day"),
+    hour: getValue("hour"),
+    minute: getValue("minute"),
+    second: getValue("second"),
+  };
+}
+
+function getNext9amPT(now: Date): Date {
+  const { year, month, day, hour, minute, second } = getPTDateParts(now);
+  const isBeforeNine =
+    hour < 9 || (hour === 9 && minute === 0 && second === 0);
+  const baseDate = new Date(Date.UTC(year, month - 1, day));
+  if (!isBeforeNine) {
+    baseDate.setUTCDate(baseDate.getUTCDate() + 1);
+  }
+  const targetYear = baseDate.getUTCFullYear();
+  const targetMonth = baseDate.getUTCMonth();
+  const targetDay = baseDate.getUTCDate();
+  const offsetMinutes = getPTOffsetMinutes(
+    new Date(Date.UTC(targetYear, targetMonth, targetDay, 9, 0, 0)),
+  );
+  const targetUtcMs =
+    Date.UTC(targetYear, targetMonth, targetDay, 9, 0, 0) -
+    offsetMinutes * 60 * 1000;
+  return new Date(targetUtcMs);
+}
+
+function useDailyRefreshAt9amPT() {
+  const [refreshToken, setRefreshToken] = useState(0);
+
+  useEffect(() => {
+    const now = new Date();
+    const nextRefresh = getNext9amPT(now);
+    const delayMs = Math.max(0, nextRefresh.getTime() - now.getTime());
+    const timeout = setTimeout(() => {
+      setRefreshToken((prev) => prev + 1);
+    }, delayMs);
+
+    return () => clearTimeout(timeout);
+  }, [refreshToken]);
+
+  return refreshToken;
+}
+
+type StaticQueryState<T> = {
+  data: T | undefined;
+  loading: boolean;
+  error: string | null;
+};
+
+function useStaticQuery<T>(
+  queryRef: any,
+  args: Record<string, unknown> = {},
+  refreshToken = 0,
+) {
+  const convex = useConvex();
+  const [state, setState] = useState<StaticQueryState<T>>({
+    data: undefined,
+    loading: true,
+    error: null,
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const runQuery = async () => {
+      try {
+        const result = await convex.query(queryRef, args);
+        if (!isMounted) return;
+        setState({ data: result as T, loading: false, error: null });
+      } catch (error) {
+        if (!isMounted) return;
+        const message =
+          error instanceof Error ? error.message : "Failed to load stats";
+        setState({ data: undefined, loading: false, error: message });
+      }
+    };
+
+    runQuery();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [convex, queryRef, refreshToken]);
+
+  return state;
+}
+
 // Message milestone counter component
-function MessageMilestoneCounter({ isDark }: { isDark: boolean }) {
-  const messageCount = useQuery(api.analytics.publicMessageCount);
+function MessageMilestoneCounter({
+  isDark,
+  refreshToken,
+}: {
+  isDark: boolean;
+  refreshToken: number;
+}) {
+  const { data: messageCount, loading } = useStaticQuery<number>(
+    api.analytics.publicMessageCount,
+    {},
+    refreshToken,
+  );
 
   // Calculate milestone targets
   const count = messageCount ?? 0;
@@ -75,7 +203,7 @@ function MessageMilestoneCounter({ isDark }: { isDark: boolean }) {
         <span
           className={`ml-auto text-[10px] font-normal ${isDark ? "text-zinc-600" : "text-[#8b7355]"}`}
         >
-          real-time
+          {loading ? "loading" : "9am PT snapshot"}
         </span>
       </h3>
 
@@ -120,8 +248,16 @@ function MessageMilestoneCounter({ isDark }: { isDark: boolean }) {
 }
 
 // Animated growth chart component
-function AnimatedGrowthChart({ isDark }: { isDark: boolean }) {
-  const growthData = useQuery(api.analytics.publicMessageGrowth);
+function AnimatedGrowthChart({
+  isDark,
+  refreshToken,
+}: {
+  isDark: boolean;
+  refreshToken: number;
+}) {
+  const { data: growthData } = useStaticQuery<
+    Array<{ date: string; count: number; cumulative: number }>
+  >(api.analytics.publicMessageGrowth, {}, refreshToken);
   const [isPlaying, setIsPlaying] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
 
@@ -153,13 +289,13 @@ function AnimatedGrowthChart({ isDark }: { isDark: boolean }) {
   const yAxisMax = getNiceMax(maxCumulative * 1.1);
 
   const handlePlay = () => {
-    setAnimationKey(prev => prev + 1);
+    setAnimationKey((prev) => prev + 1);
     setIsPlaying(true);
   };
 
   const handleReset = () => {
     setIsPlaying(false);
-    setAnimationKey(prev => prev + 1);
+    setAnimationKey((prev) => prev + 1);
   };
 
   // Fallback timeout to stop animation
@@ -222,7 +358,7 @@ function AnimatedGrowthChart({ isDark }: { isDark: boolean }) {
     try {
       const date = new Date(dateStr);
       if (isNaN(date.getTime())) return dateStr;
-      return date.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+      return date.toLocaleDateString("en", { month: "short", day: "numeric" });
     } catch {
       return dateStr;
     }
@@ -307,14 +443,23 @@ function AnimatedGrowthChart({ isDark }: { isDark: boolean }) {
           </div>
         ) : (
           <>
-            <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-right pr-2" style={{ height: chartHeight }}>
-              <span className={`text-[9px] ${isDark ? "text-zinc-600" : "text-[#8b7355]"}`}>
+            <div
+              className="absolute left-0 top-0 h-full flex flex-col justify-between text-right pr-2"
+              style={{ height: chartHeight }}
+            >
+              <span
+                className={`text-[9px] ${isDark ? "text-zinc-600" : "text-[#8b7355]"}`}
+              >
                 {formatNumber(yAxisMax)}
               </span>
-              <span className={`text-[9px] ${isDark ? "text-zinc-600" : "text-[#8b7355]"}`}>
+              <span
+                className={`text-[9px] ${isDark ? "text-zinc-600" : "text-[#8b7355]"}`}
+              >
                 {formatNumber(yAxisMax / 2)}
               </span>
-              <span className={`text-[9px] ${isDark ? "text-zinc-600" : "text-[#8b7355]"}`}>
+              <span
+                className={`text-[9px] ${isDark ? "text-zinc-600" : "text-[#8b7355]"}`}
+              >
                 0
               </span>
             </div>
@@ -367,7 +512,9 @@ function AnimatedGrowthChart({ isDark }: { isDark: boolean }) {
               <path
                 d={areaPath}
                 fill="url(#growthGradient)"
-                clipPath={isPlaying ? `url(#clipPath-${animationKey})` : undefined}
+                clipPath={
+                  isPlaying ? `url(#clipPath-${animationKey})` : undefined
+                }
               />
 
               <path
@@ -376,7 +523,9 @@ function AnimatedGrowthChart({ isDark }: { isDark: boolean }) {
                 stroke={isDark ? "#10b981" : "#059669"}
                 strokeWidth="1.5"
                 vectorEffect="non-scaling-stroke"
-                clipPath={isPlaying ? `url(#clipPath-${animationKey})` : undefined}
+                clipPath={
+                  isPlaying ? `url(#clipPath-${animationKey})` : undefined
+                }
               />
 
               {chartPoints.length > 0 && !isPlaying && (
@@ -385,7 +534,8 @@ function AnimatedGrowthChart({ isDark }: { isDark: boolean }) {
                   cy={
                     padding.top +
                     innerHeight -
-                    (chartPoints[chartPoints.length - 1].cumulative / yAxisMax) *
+                    (chartPoints[chartPoints.length - 1].cumulative /
+                      yAxisMax) *
                       innerHeight
                   }
                   r="3"
@@ -411,16 +561,22 @@ function AnimatedGrowthChart({ isDark }: { isDark: boolean }) {
       {chartPoints.length > 0 && (
         <div
           className={`mt-3 pt-3 border-t flex justify-between text-xs ${
-            isDark ? "border-zinc-800 text-zinc-500" : "border-[#e6e4e1] text-[#8b7355]"
+            isDark
+              ? "border-zinc-800 text-zinc-500"
+              : "border-[#e6e4e1] text-[#8b7355]"
           }`}
         >
           <span>
-            Total: <span className={isDark ? "text-zinc-300" : "text-[#1a1a1a]"}>
+            Total:{" "}
+            <span className={isDark ? "text-zinc-300" : "text-[#1a1a1a]"}>
               {chartPoints[chartPoints.length - 1].cumulative.toLocaleString()}
             </span>
           </span>
           <span>
-            Target: <span className={isDark ? "text-zinc-300" : "text-[#1a1a1a]"}>500k</span>
+            Target:{" "}
+            <span className={isDark ? "text-zinc-300" : "text-[#1a1a1a]"}>
+              500k
+            </span>
           </span>
         </div>
       )}
@@ -505,6 +661,7 @@ type StatsPageContentProps = {
 
 function StatsPageContent({ theme, setTheme }: StatsPageContentProps) {
   const isDark = theme === "dark";
+  const refreshToken = useDailyRefreshAt9amPT();
 
   return (
     <div
@@ -515,7 +672,9 @@ function StatsPageContent({ theme, setTheme }: StatsPageContentProps) {
       {/* Header */}
       <header
         className={`border-b ${
-          isDark ? "border-zinc-800 bg-[#0a0a0a]" : "border-[#e6e4e1] bg-[#f8f6f3]"
+          isDark
+            ? "border-zinc-800 bg-[#0a0a0a]"
+            : "border-[#e6e4e1] bg-[#f8f6f3]"
         }`}
       >
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -549,7 +708,11 @@ function StatsPageContent({ theme, setTheme }: StatsPageContentProps) {
                 : "text-[#8b7355] hover:text-[#1a1a1a] hover:bg-[#e6e4e1]"
             }`}
           >
-            {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            {isDark ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
           </button>
         </div>
       </header>
@@ -558,10 +721,10 @@ function StatsPageContent({ theme, setTheme }: StatsPageContentProps) {
       <main className="max-w-4xl mx-auto px-4 py-8">
         <div className="grid gap-6 md:grid-cols-2">
           {/* Message milestone counter */}
-          <MessageMilestoneCounter isDark={isDark} />
+          <MessageMilestoneCounter isDark={isDark} refreshToken={refreshToken} />
 
           {/* Growth chart */}
-          <AnimatedGrowthChart isDark={isDark} />
+          <AnimatedGrowthChart isDark={isDark} refreshToken={refreshToken} />
         </div>
 
         {/* Info text */}
@@ -570,7 +733,7 @@ function StatsPageContent({ theme, setTheme }: StatsPageContentProps) {
             isDark ? "text-zinc-600" : "text-[#8b7355]"
           }`}
         >
-          Real-time statistics from the OpenSync platform. Data updates automatically.
+          Stats snapshot from the OpenSync platform. Updates daily at 9am PT.
         </p>
       </main>
     </div>

@@ -36,6 +36,9 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 - [x] Stabilized public stats page rendering
   - Added local error boundary to prevent full app blanking
   - Guarded growth chart against invalid data points
+- [x] Switched stats to daily snapshots at 9am PT
+  - Loads once from the database (no realtime updates)
+  - Shows daily update status in the UI
 - [x] Added new Convex queries in analytics.ts
   - publicMessageCount: returns total message documents (no auth)
   - publicMessageGrowth: returns daily counts with cumulative totals (no auth)

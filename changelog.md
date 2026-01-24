@@ -43,6 +43,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Moved stats components from Login page to dedicated /stats page
   - Prevents potential rendering issues from impacting homepage
   - Stats accessible via /stats route (public, no auth required)
+- Stats page data now loads as a daily snapshot at 9am PT (no realtime updates)
 - codex-sync plugin integration: sync OpenAI Codex CLI sessions to OpenSync
   - Added codex-sync to README Ecosystem table and Quick Start section
   - Added Codex CLI to AI Coding Agents in Settings (status: supported)
