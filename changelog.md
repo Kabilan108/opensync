@@ -8,6 +8,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- pi-opensync-plugin community plugin support (syncs Pi coding agent sessions)
+  - Added "pi" to SourceType union with orange PI badge (#f97316)
+  - Added Pi to Login page "Syncs with" section with SVG icon
+  - Added Pi to Settings AI Agents with community status badge
+  - Added Pi plugin card to Dashboard setup banner with install command
+  - Added Pi source label mapping to Evals page
+  - Updated README ecosystem table with pi-opensync-plugin links
 - One-click deploy buttons for Vercel and Netlify in README
   - Deploy buttons deploy frontend only with explicit warning
   - Created ONE-CLICK-DEPLOY.md post-deploy checklist with step-by-step Convex/WorkOS/OpenAI setup

@@ -7,12 +7,23 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 ## Active Tasks
 
 - [ ] (add next task here)
+
+## Recently Completed (Pi Plugin Integration)
+
+- [x] pi-opensync-plugin community plugin support (PR #26)
+  - Added "pi" to SourceType union with orange PI badge (#f97316)
+  - Added Pi to Login page "Syncs with" section with custom SVG icon
+  - Added pi-opensync-plugin to Login page plugin list with community badge
+  - Added Pi to Settings AI Agents with community status and defaultEnabled: false
+  - Added Pi plugin card to Dashboard setup banner with npm install command
+  - Added Pi source label mapping to Evals page
+  - Updated README ecosystem table with GitHub and npm links
 - [ ] fix write conflicts
 - [ ] workos domain updates
 - [ ] models untitled
 - [ ] add custom doamin
 - [ ] look up api provission
-- [ ] add 
+- [ ] add
 - [ ] let users change session name
 - [ ] setup https://github.com/waynesutton/opensync/community
 
