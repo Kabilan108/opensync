@@ -8,10 +8,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
-- Platform Stats now loads ALL session data instead of last 1000 sessions
-  - Changed publicPlatformStats query to use async iteration (streams data without memory limits)
-  - Added total sessions and total tokens display in Platform Stats header
-  - Same pattern used by publicMessageCount and publicMessageGrowth queries
+- Platform Stats header now displays "last 1000 sessions" label for clarity
+  - Users know the leaderboard data is based on recent activity, not all-time totals
 
 ### Fixed
 

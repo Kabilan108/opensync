@@ -696,7 +696,6 @@ export const publicMessageGrowth = query({
 
 // Public platform-wide stats for homepage leaderboard (no auth required)
 // Returns top models and top CLI sources sorted by usage
-// Uses async iteration to stream ALL sessions without hitting memory limits
 export const publicPlatformStats = query({
   args: {},
   returns: v.object({
@@ -714,27 +713,28 @@ export const publicPlatformStats = query({
         totalTokens: v.number(),
       }),
     ),
-    totalSessions: v.number(),
-    totalTokens: v.number(),
   }),
   handler: async (ctx) => {
-    // Aggregate by model (streams all sessions without loading into memory)
+    // Fetch recent sessions for platform-wide stats (limit to 1000 to avoid timeout)
+    const sessions = await ctx.db.query("sessions").order("desc").take(1000);
+
+    if (sessions.length === 0) {
+      return {
+        topModels: [],
+        topSources: [],
+      };
+    }
+
+    // Aggregate by model
     const modelMap: Record<string, { totalTokens: number; sessions: number }> =
       {};
     // Aggregate by source (CLI tool)
     const sourceMap: Record<string, { sessions: number; totalTokens: number }> =
       {};
 
-    let totalSessions = 0;
-    let totalTokens = 0;
-
-    // Stream through ALL sessions using async iteration (avoids 16MB read limit)
-    for await (const s of ctx.db.query("sessions")) {
-      totalSessions += 1;
-
+    for (const s of sessions) {
       // Safe token value (handle null/undefined)
       const tokens = s.totalTokens ?? 0;
-      totalTokens += tokens;
 
       // Model aggregation
       const model = s.model || "unknown";
@@ -751,16 +751,6 @@ export const publicPlatformStats = query({
       }
       sourceMap[source].sessions += 1;
       sourceMap[source].totalTokens += tokens;
-    }
-
-    // Return empty arrays if no data
-    if (totalSessions === 0) {
-      return {
-        topModels: [],
-        topSources: [],
-        totalSessions: 0,
-        totalTokens: 0,
-      };
     }
 
     // Sort models by total tokens and take top 5
@@ -786,8 +776,6 @@ export const publicPlatformStats = query({
     return {
       topModels,
       topSources,
-      totalSessions,
-      totalTokens,
     };
   },
 });

@@ -8,14 +8,11 @@ OpenSync supports two AI coding tools: **OpenCode** and **Claude Code**.
 
 - [ ] (add next task here)
 
-## Recently Completed (Platform Stats Full Data)
+## Recently Completed (Platform Stats Label)
 
-- [x] Platform Stats now loads ALL session data instead of last 1000 sessions
-  - Changed publicPlatformStats query from `.take(1000)` to async iteration
-  - Streams through all sessions without memory limits (same pattern as publicMessageCount)
-  - Added totalSessions and totalTokens to query return value
-  - Updated Login.tsx PlatformLeaderboard to display total counts in header
-  - Homepage won't crash with large datasets
+- [x] Added "last 1000 sessions" label to Platform Stats header
+  - Clarifies that leaderboard data is based on recent activity
+  - Keeps query limited to 1000 sessions for performance
 
 ## Recently Completed (Stats.tsx Build Fix)
 
